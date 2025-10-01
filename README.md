@@ -59,3 +59,15 @@ If you discover a security vulnerability within Laravel, please send an e-mail t
 ## License
 
 The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+
+
+  # Desain Web Responsif
+
+  This is a code bundle for Desain Web Responsif. The original project is available at https://www.figma.com/design/FrZKJKHv5KSwHnrHGuzrxZ/Desain-Web-Responsif.
+
+  ## Running the code
+
+  Run `npm i` to install the dependencies.
+
+  Run `npm run dev` to start the development server.
+  
