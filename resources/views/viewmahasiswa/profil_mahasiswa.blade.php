@@ -3,7 +3,7 @@
 
 @section('content')
 <div class="container-fluid">
-    <h2 class="mb-4">Daftar Profil Mahasiswa</h2>
+    <h3 class="mb-4">Daftar Profil Mahasiswa</h3>
 
     <!-- Filter Tahun -->
     <form method="GET" class="mb-3">
@@ -12,7 +12,7 @@
                 <select name="tahun" class="form-control" onchange="this.form.submit()">
                     <option value="">-- Pilih Tahun --</option>
                     @foreach($tahunList as $t)
-                        <option value="{{ $t }}" {{ $tahun == $t ? 'selected' : '' }}>{{ $t }}</option>
+                    <option value="{{ $t }}" {{ $tahun == $t ? 'selected' : '' }}>{{ $t }}</option>
                     @endforeach
                 </select>
             </div>
@@ -28,7 +28,7 @@
                 <th>Fakultas</th>
                 <th>Prodi</th>
                 <th>Tahun</th>
-                <th>Aksi</th> <!-- Kolom aksi -->
+                <th>Aksi</th>
             </tr>
         </thead>
         <tbody>
@@ -41,7 +41,6 @@
                 <td>{{ $m->prodi }}</td>
                 <td>{{ $m->tahun }}</td>
                 <td>
-                    <!-- Tombol Edit -->
                     <button type="button" class="btn btn-sm btn-warning edit-btn-profil"
                         data-nim="{{ $m->nim }}"
                         data-nama="{{ $m->nama_mahasiswa }}"
@@ -53,7 +52,6 @@
                         Edit
                     </button>
 
-                    <!-- Tombol Hapus -->
                     <form action="{{ route('profil.destroy', $m->nim) }}" method="POST" style="display:inline-block;" onsubmit="return confirm('Yakin ingin menghapus data ini?')">
                         @csrf
                         @method('DELETE')
@@ -72,38 +70,42 @@
 @endsection
 
 @push('scripts')
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.11.5/js/dataTables.bootstrap5.min.js"></script>
 <script>
-$(document).ready(function() {
-    $('#profilTable').DataTable({
-        scrollX: true,
-        autoWidth: false,
-        responsive: false,
-        language: {
-            search: "Cari:",
-            lengthMenu: "Tampilkan _MENU_ data per halaman",
-            zeroRecords: "Tidak ada data yang ditemukan",
-            info: "Menampilkan halaman _PAGE_ dari _PAGES_",
-            infoEmpty: "Tidak ada data yang tersedia",
-            infoFiltered: "(difilter dari _MAX_ total data)",
-            paginate: {
-                first: "Pertama",
-                last: "Terakhir",
-                next: "Selanjutnya",
-                previous: "Sebelumnya"
+    $(document).ready(function() {
+        // Inisialisasi DataTables
+        $('#profilTable').DataTable({
+            scrollX: true,
+            autoWidth: false,
+            responsive: true,
+            language: {
+                search: "Cari:",
+                lengthMenu: "Tampilkan _MENU_ data per halaman",
+                zeroRecords: "Tidak ada data yang ditemukan",
+                info: "Menampilkan halaman _PAGE_ dari _PAGES_",
+                infoEmpty: "Tidak ada data yang tersedia",
+                infoFiltered: "(difilter dari _MAX_ total data)",
+                paginate: {
+                    first: "Pertama",
+                    last: "Terakhir",
+                    next: "Selanjutnya",
+                    previous: "Sebelumnya"
+                }
             }
-        }
-    });
+        });
 
-    // Edit Profil Mahasiswa
-    $('.edit-btn-profil').click(function() {
-        let btn = $(this);
-        $('#edit_nim').val(btn.data('nim'));
-        $('#edit_nama').val(btn.data('nama'));
-        $('#edit_fakultas').val(btn.data('fakultas'));
-        $('#edit_prodi').val(btn.data('prodi'));
-        $('#edit_tahun').val(btn.data('tahun'));
-        $('#editProfilForm').attr('action', '/viewmahasiswa/profil/' + btn.data('nim'));
+        // Edit Profil Mahasiswa
+        $('.edit-btn-profil').click(function() {
+            let btn = $(this);
+            $('#edit_nim').val(btn.data('nim'));
+            $('#edit_nama').val(btn.data('nama'));
+            $('#edit_fakultas').val(btn.data('fakultas'));
+            $('#edit_prodi').val(btn.data('prodi'));
+            $('#edit_tahun').val(btn.data('tahun'));
+            $('#editProfilForm').attr('action', '/viewmahasiswa/profil/' + btn.data('nim'));
+        });
     });
-});
 </script>
 @endpush

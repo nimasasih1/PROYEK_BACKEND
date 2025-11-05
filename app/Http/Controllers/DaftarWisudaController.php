@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Mahasiswa;
 use App\Models\PendaftaranWisuda;
+use App\Models\Skpi;
 use App\Models\Toga;
 use Illuminate\Http\Request;
 
@@ -245,12 +246,19 @@ class DaftarWisudaController extends Controller
 
     public function destroy($id)
     {
-        $wisuda1 = PendaftaranWisuda::find($id);
-        if ($wisuda1) {
-            $wisuda1->delete();
-        }
-        return redirect()->back()->with('success', 'Data wisuda berhasil dihapus!');
+        $wisuda = PendaftaranWisuda::findOrFail($id);
+
+        // Ambil id_pendaftaran
+        $idPendaftaran = $wisuda->id_pendaftaran;
+        $idMahasiswa   = $wisuda->id_mahasiswa;
+
+        \DB::table('pengambilan')->where('id_pendaftaran', $idPendaftaran)->delete();
+        Skpi::where('id_mahasiswa', $idMahasiswa)->delete();
+        $wisuda->delete();
+
+        return redirect()->back()->with('success', 'Data wisuda & pengambilan berhasil dihapus!');
     }
+
 
     public function update(Request $request, $id)
     {
@@ -447,13 +455,41 @@ class DaftarWisudaController extends Controller
         return view('viewmahasiswa.pending', compact('data', 'tahun', 'tahunList', 'filter'));
     }
 
-    public function selesai()
-    {
-        $data = PendaftaranWisuda::with(['mahasiswa', 'toga'])
-            ->where('status_pendaftaran', 'disetujui')
-            ->orderBy('id_pendaftaran', 'desc')
-            ->get();
+    public function selesai(Request $request)
+{
+    $tahun = session('tahun_filter');
+    $filter = $request->get('filter');
 
-        return view('layouts4.selesai', compact('data'));
-    }
+    $data = PendaftaranWisuda::with(['mahasiswa', 'toga'])
+        ->when($tahun, function ($q) use ($tahun) {
+            $q->whereHas('mahasiswa', function ($q2) use ($tahun) {
+                $q2->where('tahun', $tahun);
+            });
+        })
+        ->where('is_valid_finance', 1)
+        ->where('is_valid_perpus', 1)
+        ->where('is_valid_fakultas', 1)
+        ->where('is_valid_baak', 1) // ✅ filter utama Selesai
+        ->when($filter, function ($q) use ($filter) {
+            if ($filter === 'finance') {
+                $q->where('is_valid_finance', 1);
+            } elseif ($filter === 'perpus') {
+                $q->where('is_valid_perpus', 1);
+            } elseif ($filter === 'fakultas') {
+                $q->where('is_valid_fakultas', 1);
+            } elseif ($filter === 'baak') {
+                $q->where('is_valid_baak', 1);
+            }
+        })
+        ->orderBy('id_pendaftaran', 'desc')
+        ->get();
+
+    $tahunList = Mahasiswa::select('tahun')
+        ->distinct()
+        ->orderBy('tahun', 'desc')
+        ->pluck('tahun');
+
+    return view('viewmahasiswa.selesai', compact('data', 'tahun', 'tahunList', 'filter'));
+}
+
 }

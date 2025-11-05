@@ -117,6 +117,9 @@ return [
     | Supported drivers: "file", "cache"
     |
     */
+    
+    'captcha' => Mews\Captcha\Facades\Captcha::class,
+
 
     'maintenance' => [
         'driver' => env('APP_MAINTENANCE_DRIVER', 'file'),

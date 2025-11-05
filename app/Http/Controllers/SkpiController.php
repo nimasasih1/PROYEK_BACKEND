@@ -28,12 +28,19 @@ class SkpiController extends Controller
     public function store(Request $request)
     {
         $user = auth()->user();
-        $mahasiswa = Mahasiswa::where('nim', $user->username)->first(); // ambil mahasiswa login
+        $mahasiswa = Mahasiswa::where('nim', $user->username)->first();
 
         if (!$mahasiswa) {
             return redirect()->back()->with('error', 'Data mahasiswa tidak ditemukan.');
         }
 
+        // Cek apakah mahasiswa sudah submit SKPI sebelumnya
+        $existing = Skpi::where('id_mahasiswa', $mahasiswa->id_mahasiswa)->first();
+        if ($existing) {
+            return redirect()->back()->with('error', 'Kamu sudah mengajukan SKPI sebelumnya!');
+        }
+
+        // Validasi input
         $request->validate([
             'tgl_pengajuan_mahasiswa' => 'required|date',
             'jenjang_mahasiswa' => 'required|string|max:50',
@@ -41,21 +48,42 @@ class SkpiController extends Controller
             'email_mahasiswa' => 'required|email|max:100',
             'alamat_mahasiswa' => 'required|string',
             'ttd_mahasiswa' => 'required',
+            'file_skpi' => 'required|file|mimes:pdf,jpg,png|max:2048',
         ]);
 
-        Skpi::create([
-            'id_mahasiswa' => $mahasiswa->id_mahasiswa, // foreign key ke mahasiswa
+        // Simpan data (sama seperti sebelumnya)
+        $data = [
+            'id_mahasiswa' => $mahasiswa->id_mahasiswa,
             'tgl_pengajuan_mahasiswa' => $request->tgl_pengajuan_mahasiswa,
             'jenjang_mahasiswa' => $request->jenjang_mahasiswa,
             'no_hp_mahasiswa' => $request->no_hp_mahasiswa,
             'email_mahasiswa' => $request->email_mahasiswa,
             'alamat_mahasiswa' => $request->alamat_mahasiswa,
-            'ttd_mahasiswa' => $request->ttd_mahasiswa,
             'status_skpi' => 'Pending',
-        ]);
+        ];
+
+        // TTD
+        if ($request->ttd_mahasiswa) {
+            $ttd = str_replace('data:image/png;base64,', '', $request->ttd_mahasiswa);
+            $ttd = str_replace(' ', '+', $ttd);
+            $fileName = 'ttd_' . time() . '.png';
+            \File::put(public_path('uploads/ttd/' . $fileName), base64_decode($ttd));
+            $data['ttd_mahasiswa'] = $fileName;
+        }
+
+        // File SKPI
+        if ($request->hasFile('file_skpi')) {
+            $file = $request->file('file_skpi');
+            $fileName = 'skpi_' . time() . '.' . $file->getClientOriginalExtension();
+            $file->move(public_path('uploads/skpi'), $fileName);
+            $data['file_skpi'] = $fileName;
+        }
+
+        Skpi::create($data);
 
         return redirect()->back()->with('success', 'Pengajuan SKPI berhasil dikirim!');
     }
+
 
     public function update(Request $request, $id)
     {

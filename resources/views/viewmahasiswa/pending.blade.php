@@ -18,6 +18,7 @@
         </form>
     </div>
 
+    <div class="table-responsive" style="overflow-x: auto; max-width: 100%;">
     <table id="wisudaPendingTable" class="table table-bordered display nowrap" style="width:100%">
         <thead class="table-dark">
             <tr>
@@ -32,10 +33,10 @@
                 <th>Catatan</th>
                 <th>Tanda Tangan</th>
                 <th>Finance</th>
-                <th>Perpus</th>
+                <th>Library</th>
                 <th>Fakultas</th>
                 <th>BAAK</th>
-                <th>Catatan Fakultas</th>
+                <th>Catatan Fakulty</th>
                 <th>Catatan Finance</th>
                 <th>Catatan BAAK</th>
                 <th>Status</th>
@@ -149,10 +150,14 @@
             @endforeach
         </tbody>
     </table>
+    </div>
 </div>
 @endsection
 
 @push('scripts')
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.11.5/js/dataTables.bootstrap5.min.js"></script>
 <script>
     $(function() {
         $('#wisudaPendingTable').DataTable({

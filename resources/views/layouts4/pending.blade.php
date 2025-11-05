@@ -4,6 +4,19 @@
 @section('content')
 <div class="container-fluid">
     <h2 class="mb-4">Data Wisuda Pending</h2>
+
+     @php
+        $totalMahasiswa = $data->count();
+        $sudahCeklis = $data->where('is_valid_perpus', 1)->count();
+        $belumCeklis = $totalMahasiswa - $sudahCeklis;
+    @endphp
+    <div class="mb-3">
+        <span class="badge bg-primary me-2">Total Mahasiswa: {{ $totalMahasiswa }}</span>
+        <span class="badge bg-success me-2">Approve: {{ $sudahCeklis }}</span>
+        <span class="badge bg-warning text-dark">Belum Approve: {{ $belumCeklis }}</span>
+    </div>
+
+     <div class="table-responsive" style="overflow-x: auto; max-width: 100%;">
     <table id="wisudaPendingTable" class="table table-bordered display nowrap" style="width:100%">
         <thead class="table-dark">
             <tr>
@@ -103,6 +116,7 @@
             @endforeach
         </tbody>
     </table>
+     </div>
 </div>
 @endsection
 

@@ -1,4 +1,4 @@
-@extends('layouts.dashboard')
+@extends('1layouts.dashboard')
 
 @section('content')
 <h2>Edit Informasi Wisuda</h2>
@@ -30,10 +30,8 @@
     <label>Jadwal Wisuda</label>
     <input type="date" name="jadwal_wisuda" value="{{ $info->jadwal_wisuda }}" class="form-control" required>
   </div>
-  <div class="mb-3">
-    <label>Review</label>
-    <textarea name="review" class="form-control">{{ $info->review }}</textarea>
-  </div>
   <button type="submit" class="btn btn-success">Update</button>
 </form>
+
+<a href="{{ url('/dashboard/index1') }}" class="btn btn-secondary ms-2">Kembali</a>
 @endsection

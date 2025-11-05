@@ -10,7 +10,7 @@ use App\Models\Skpi;
 
 class MahasiswaController extends Controller
 {
-
+    // 📄 Daftar mahasiswa (untuk admin)
     public function index(Request $request)
     {
         $tahunList = Mahasiswa::select('tahun')->distinct()->orderBy('tahun', 'desc')->pluck('tahun');
@@ -41,9 +41,78 @@ class MahasiswaController extends Controller
             })
             ->get();
 
+        $data = PendaftaranWisuda::with('mahasiswa', 'toga')
+            ->when($tahun, function ($query, $tahun) {
+                $query->whereHas('mahasiswa', function ($q) use ($tahun) {
+                    $q->where('tahun', $tahun);
+                });
+            })
+            ->get();
+
         return view('viewmahasiswa.profil_mahasiswa', compact('mahasiswa', 'tahunList', 'tahun', 'wisuda', 'skpi'));
     }
 
+    // 🟢 Tampilkan profil mahasiswa (user)
+
+    public function show()
+    {
+        $user = Auth::user();
+
+        // Ambil data mahasiswa berdasarkan username yang login
+        $mahasiswa = Mahasiswa::where('nim', $user->username)->first();
+
+        $pendaftaran = null;
+        $hasCatatan = false;
+
+        if ($mahasiswa) {
+            // Pastikan hanya ambil pendaftaran kalau mahasiswa ada
+            $pendaftaran = \App\Models\PendaftaranWisuda::where('id_mahasiswa', $mahasiswa->id_mahasiswa)
+                ->latest()
+                ->first();
+
+            if (
+                $pendaftaran &&
+                ($pendaftaran->catatan_fakultas ||
+                    $pendaftaran->catatan_perpus ||
+                    $pendaftaran->catatan_baak ||
+                    $pendaftaran->catatan_finance)
+            ) {
+                $hasCatatan = true;
+            }
+        }
+
+        // $mahasiswa bisa null, blade nanti handle tampilannya
+        return view('profil_mahasiswa', compact('user', 'mahasiswa', 'pendaftaran', 'hasCatatan'));
+    }
+
+
+    // 🟡 EDIT untuk ADMIN
+    public function edit($nim = null)
+    {
+        // admin bisa mengedit data siapa saja
+        $mahasiswa = Mahasiswa::where('nim', $nim)->first();
+
+        if (!$mahasiswa) {
+            $mahasiswa = new Mahasiswa(['nim' => $nim]);
+        }
+
+        return view('viewmahasiswa.edit_mahasiswa_admin', compact('mahasiswa'));
+    }
+
+    // 🟡 EDIT PROFIL (untuk USER yang login)
+    public function editProfilUser()
+    {
+        $user = Auth::user();
+        $mahasiswa = Mahasiswa::where('nim', $user->username)->first();
+
+        if (!$mahasiswa) {
+            $mahasiswa = new Mahasiswa(['nim' => $user->username]);
+        }
+
+        return view('edit_profil', compact('user', 'mahasiswa'));
+    }
+
+    // 🔵 Simpan atau update profil (POST)
     public function store(Request $request)
     {
         $request->validate([
@@ -55,55 +124,20 @@ class MahasiswaController extends Controller
 
         $user = Auth::user();
 
-        // simpan data baru untuk mahasiswa login
-        Mahasiswa::create([
-            'nim'            => $user->username,
-            'nama_mahasiswa' => $request->nama_mahasiswa,
-            'fakultas'       => $request->fakultas,
-            'prodi'          => $request->prodi,
-            'tahun'          => $request->tahun,
-        ]);
+        Mahasiswa::updateOrCreate(
+            ['nim' => $user->username],
+            [
+                'nama_mahasiswa' => $request->nama_mahasiswa,
+                'fakultas'       => $request->fakultas,
+                'prodi'          => $request->prodi,
+                'tahun'          => $request->tahun,
+            ]
+        );
 
-        return redirect()->back()->with('success', 'Profil mahasiswa berhasil disimpan!');
+        return redirect()->route('profil_mahasiswa.show')->with('success', 'Profil mahasiswa berhasil diperbarui!');
     }
 
-    public function edit()
-    {
-        $user = Auth::user();
-
-        // Cari mahasiswa berdasarkan nim (username login)
-        $mahasiswa = Mahasiswa::where('nim', $user->username)->first();
-
-        // Jika belum ada, buat object kosong agar form tetap bisa diisi
-        if (!$mahasiswa) {
-            $mahasiswa = new Mahasiswa([
-                'nim' => $user->username
-            ]);
-        }
-
-        return view('profil_mahasiswa', compact('user', 'mahasiswa'));
-    }
-
-    public function update(Request $request, $nim)
-    {
-        $request->validate([
-            'nama_mahasiswa' => 'required|string|max:255',
-            'fakultas' => 'required|string|max:255',
-            'prodi' => 'required|string|max:255',
-            'tahun' => 'required|integer',
-        ]);
-
-        $mahasiswa = Mahasiswa::where('nim', $nim)->firstOrFail();
-
-        $mahasiswa->update([
-            'nama_mahasiswa' => $request->nama_mahasiswa,
-            'fakultas' => $request->fakultas,
-            'prodi' => $request->prodi,
-            'tahun' => $request->tahun,
-        ]);
-
-        return redirect()->back()->with('success', 'Data mahasiswa berhasil diperbarui!');
-    }
+    // 🔴 Hapus data mahasiswa (admin)
     public function destroy($nim)
     {
         $mahasiswa = Mahasiswa::where('nim', $nim)->first();

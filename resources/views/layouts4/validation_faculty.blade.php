@@ -16,6 +16,7 @@
         <span class="badge bg-warning text-dark">Belum Approve: {{ $belumCeklis }}</span>
     </div>
 
+     <div class="table-responsive" style="overflow-x: auto; max-width: 100%;">
     <table id="wisudaTable" class="table table-bordered display nowrap" style="width:100%">
         <thead class="table-dark">
             <tr>
@@ -120,6 +121,7 @@
             @endforeach
         </tbody>
     </table>
+     </div>
 </div>
 @endsection
 
@@ -167,7 +169,6 @@
         error: function(err) {
             console.error(err);
         }
-    });
     });
     });
 </script>

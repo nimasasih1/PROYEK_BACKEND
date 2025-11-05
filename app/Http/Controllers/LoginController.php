@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Mews\Captcha\Facades\Captcha; // ← tambahkan ini
 
 class LoginController extends Controller
 {
@@ -17,6 +18,7 @@ class LoginController extends Controller
         $request->validate([
             'username' => 'required|string',
             'password' => 'required|string',
+            'captcha' => 'required|captcha', // ← validasi captcha
         ]);
 
         if (Auth::attempt(['username' => $request->username, 'password' => $request->password])) {
@@ -25,7 +27,7 @@ class LoginController extends Controller
 
             switch ($user->role) {
                 case 'mahasiswa':
-                    return redirect()->intended('/beranda'); // arah ke profil mahasiswa
+                    return redirect()->intended('/beranda');
                 case 'baak':
                     return redirect()->intended('/layouts');
                 case 'finance':

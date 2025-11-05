@@ -16,7 +16,7 @@ class TogaControllers extends Controller
 
         $pendaftaran = PendaftaranWisuda::with('mahasiswa')->get();
 
-        return view('Toga.index', compact('dataToga', 'pendaftaran'));
+        return view('beranda', compact('dataToga', 'pendaftaran'));
     }
 
     public function store(Request $request)
@@ -30,7 +30,7 @@ class TogaControllers extends Controller
 
             Toga::create($request->all());
 
-        return redirect()->route('Toga.index')
-                         ->with('success', 'Data pengambilan berhasil disimpan');
+        return redirect()->route('beranda')
+                         ->with('success', 'Data pendaftaran berhasil disimpan');
     }
 }
