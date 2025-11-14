@@ -48,6 +48,7 @@
   <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
   <script src="https://cdn.datatables.net/1.11.5/js/dataTables.bootstrap5.min.js"></script>
 
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
   
 </head>
 
@@ -57,7 +58,7 @@
   <div class="layout-container">
 
     <!-- Sidebar Menu -->
-    <aside id="layout-menu" class="layout-menu menu-vertical menu bg-menu-theme">
+    <aside id="layout-menu" class="layout-menu menu-vertical menu bg-menu-theme position-fixed top-0 start-0 h-100">
       <div class="app-brand demo">
   <a href="{{ route('dashboard.index') }}" class="app-brand-link align-items-center">
     <!-- Ganti SVG ke logo -->
@@ -117,7 +118,7 @@
         <!-- /Sidebar -->
 
         <!-- Main Content -->
-        <div class="layout-page">
+        <div class="layout-page" style="margin-left: 260px;">
           <!-- Navbar -->
          <nav class="layout-navbar container-xxl navbar navbar-expand-xl navbar-detached align-items-center bg-navbar-theme" id="layout-navbar">
   <div class="layout-menu-toggle navbar-nav align-items-xl-center me-3 me-xl-0 d-xl-none">

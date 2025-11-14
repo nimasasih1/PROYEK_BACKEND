@@ -21,7 +21,6 @@
                     <th>No. HP</th>
                     <th>Email</th>
                     <th>Alamat</th>
-                    <th>Tanda Tangan</th>
                     <th>Aksi</th>
                 </tr>
             </thead>
@@ -40,13 +39,6 @@
                     <td>{{ $item->email_mahasiswa ?? '-' }}</td>
                     <td>{{ $item->alamat_mahasiswa ?? '-' }}</td>
                     <td>
-                        @if($item->ttd_mahasiswa)
-                            <img src="{{ asset('uploads/ttd/' . $item->ttd_mahasiswa) }}" alt="Tanda Tangan" width="400">
-                        @else
-                            -
-                        @endif
-                    </td>
-                    <td>
                         <button
                             type="button"
                             class="btn btn-sm btn-warning edit-btn-skpi"
@@ -58,13 +50,13 @@
                             data-hp="{{ $item->no_hp_mahasiswa }}"
                             data-email="{{ $item->email_mahasiswa }}"
                             data-alamat="{{ $item->alamat_mahasiswa }}">
-                            Edit
+                            <i class="bi bi-pencil"></i>
                         </button>
                         <form action="{{ route('skpi.destroy', $item->id_skpi) }}" method="POST" class="d-inline"
                             onsubmit="return confirm('Yakin ingin menghapus data ini?')">
                             @csrf
                             @method('DELETE')
-                            <button type="submit" class="btn btn-sm btn-danger">Hapus</button>
+                            <button type="submit" class="btn btn-sm btn-danger"><i class="bi bi-trash"></i></button>
                         </form>
                     </td>
                 </tr>

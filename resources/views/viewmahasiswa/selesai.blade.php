@@ -17,7 +17,6 @@
                 <th>Tanggal Pendaftaran</th>
                 <th>Ukuran</th>
                 <th>Catatan</th>
-                <th>Tanda Tangan</th>
                 <th>Finance</th>
                 <th>Perpus</th>
                 <th>Fakultas</th>
@@ -42,13 +41,6 @@
                 <td>{{ $pendaftaran->tgl_pendaftaran ?? '-' }}</td>
                 <td>{{ $pendaftaran->toga->ukuran ?? '-' }}</td>
                 <td>{{ $pendaftaran->toga->catatan ?? '-' }}</td>
-                <td>
-                    @if (!empty($pendaftaran->toga->ttd))
-                    <img src="{{ $pendaftaran->toga->ttd }}" alt="Tanda Tangan" width="150">
-                    @else
-                    -
-                    @endif
-                </td>
                 <td>✔</td>
                 <td>✔</td>
                 <td>✔</td>

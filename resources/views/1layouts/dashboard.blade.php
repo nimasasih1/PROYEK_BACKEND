@@ -51,7 +51,7 @@
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
   <script src="https://cdn.datatables.net/1.11.5/js/dataTables.bootstrap5.min.js"></script>
-
+  
   
 </head>
 
@@ -253,6 +253,9 @@
           </div>
         </footer>
         <!-- / Footer -->
+          <footer class="text-center py-3 bg-light border-top mt-4">
+            <small>&copy; 2025 Sistem Wisuda. All rights reserved.</small>
+          </footer>
 
         <div class="content-backdrop fade"></div>
       </div>

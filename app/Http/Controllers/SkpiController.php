@@ -47,7 +47,7 @@ class SkpiController extends Controller
             'no_hp_mahasiswa' => 'required|string|max:20',
             'email_mahasiswa' => 'required|email|max:100',
             'alamat_mahasiswa' => 'required|string',
-            'ttd_mahasiswa' => 'required',
+            'ttd_mahasiswa' => 'nullable',
             'file_skpi' => 'required|file|mimes:pdf,jpg,png|max:2048',
         ]);
 

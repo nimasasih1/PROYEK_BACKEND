@@ -59,49 +59,62 @@
           @endif
 
           <!-- Login Form -->
-          <form method="POST" action="{{ route('login.submit') }}">
-            @csrf
+<form method="POST" action="{{ route('login.submit') }}">
+  @csrf
 
-            <div class="mb-3">
-              <label for="username" class="form-label">Username / NIM</label>
-              <input type="text" name="username" class="form-control" id="username" required autofocus />
-            </div>
+  <div class="mb-3">
+    <label for="username" class="form-label">Username / NIM</label>
+    <input type="text" name="username" class="form-control @error('username') is-invalid @enderror" 
+           id="username" value="{{ old('username') }}" autofocus />
+    @error('username')
+      <div class="invalid-feedback">{{ $message }}</div>
+    @enderror
+  </div>
 
-            <div class="mb-3 form-password-toggle">
-              <label for="password" class="form-label">Password</label>
-              <div class="input-group input-group-merge">
-                <input type="password" name="password" class="form-control" id="password" placeholder="&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;" required />
-                <span class="input-group-text cursor-pointer"><i class="bx bx-hide"></i></span>
-              </div>
-            </div>
+  <div class="mb-3 form-password-toggle">
+    <label for="password" class="form-label">Password</label>
+    <div class="input-group input-group-merge">
+      <input type="password" name="password" class="form-control @error('password') is-invalid @enderror" 
+             id="password" placeholder="&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;" />
+      <span class="input-group-text cursor-pointer"><i class="bx bx-hide"></i></span>
+    </div>
+    @error('password')
+      <div class="invalid-feedback d-block">{{ $message }}</div>
+    @enderror
+  </div>
 
-            <div class="mb-3">
-              <label class="form-label">Captcha</label>
-              <div class="d-flex align-items-center mb-2">
-                <img src="{{ captcha_src('flat') }}" alt="captcha" id="captcha-image">
-                <button type="button" onclick="refreshCaptcha()" class="btn btn-outline-secondary btn-sm ms-2">↻</button>
-              </div>
-              <input type="text" name="captcha" class="form-control" placeholder="Masukkan teks di atas" required>
-            </div>
+  <div class="mb-3">
+    <label class="form-label">Captcha</label>
+    <div class="d-flex align-items-center mb-2">
+      <img src="{{ captcha_src('flat') }}" alt="captcha" id="captcha-image">
+      <button type="button" onclick="refreshCaptcha()" class="btn btn-outline-secondary btn-sm ms-2">↻</button>
+    </div>
+    <input type="text" name="captcha" class="form-control @error('captcha') is-invalid @enderror" 
+           placeholder="Masukkan teks di atas">
+    @error('captcha')
+      <div class="invalid-feedback">{{ $message }}</div>
+    @enderror
+  </div>
 
-            <div class="mb-3">
-              <button type="submit" class="btn btn-primary d-grid w-100">Login</button>
-            </div>
+  <div class="mb-3">
+    <button type="submit" class="btn btn-primary d-grid w-100">Login</button>
+  </div>
 
-            @if($errors->any())
-              <div class="alert alert-danger mt-2">
-                @foreach($errors->all() as $error)
-                  <p class="mb-0">{{ $error }}</p>
-                @endforeach
-              </div>
-            @endif
-          </form>
+  <!-- Fallback untuk error lainnya -->
+  @if($errors->any() && !$errors->has('username') && !$errors->has('password') && !$errors->has('captcha'))
+    <div class="alert alert-danger mt-2">
+      @foreach($errors->all() as $error)
+        <p class="mb-0">{{ $error }}</p>
+      @endforeach
+    </div>
+  @endif
+</form>
 
-         <!--
+
           <p class="text-center mt-4">
             <span>Belum Terdaftar?</span>
             <a href="{{ route('register.form') }}"><span>Register</span></a>
-          </p>-->
+          </p>
           
 
 
@@ -127,7 +140,7 @@ function refreshCaptcha() {
 <script src="../assets/vendor/js/bootstrap.js"></script>
 <script src="../assets/vendor/libs/perfect-scrollbar/perfect-scrollbar.js"></script>
 <script src="../assets/vendor/js/menu.js"></script>
-<script src="../assets/js/main.js"></script>
+<script src="../assezts/js/main.js"></script>
 <script async defer src="https://buttons.github.io/buttons.js"></script>
 </body>
 </html>

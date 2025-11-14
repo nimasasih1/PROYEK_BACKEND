@@ -49,13 +49,13 @@
                         data-tahun="{{ $m->tahun }}"
                         data-bs-toggle="modal"
                         data-bs-target="#editProfilModal">
-                        Edit
+                        <i class="bi bi-pencil"></i>
                     </button>
 
                     <form action="{{ route('profil.destroy', $m->nim) }}" method="POST" style="display:inline-block;" onsubmit="return confirm('Yakin ingin menghapus data ini?')">
                         @csrf
                         @method('DELETE')
-                        <button type="submit" class="btn btn-sm btn-danger">Hapus</button>
+                        <button type="submit" class="btn btn-sm btn-danger"><i class="bi bi-trash"></i></button>
                     </form>
                 </td>
             </tr>

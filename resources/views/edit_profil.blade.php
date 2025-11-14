@@ -211,8 +211,8 @@ $hasCatatan = true;
                 </div>
 
                 <div class="d-flex justify-content-between">
+                     <a href="{{ url('/profil-mahasiswa') }}" class="btn btn-secondary">Kembali</a>
                     <button type="submit" class="btn btn-primary">Simpan</button>
-                    <a href="{{ url('/profil-mahasiswa') }}" class="btn btn-secondary">Kembali</a>
                 </div>
             </form>
         </div>

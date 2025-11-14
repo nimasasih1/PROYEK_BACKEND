@@ -236,37 +236,17 @@ $hasCatatan = true;
     <!-- Tambah pilihan ukuran lengkap -->
     <label class="form-label">Ukuran Toga</label>
 
-    <div class="form-check">
-        <input class="form-check-input" type="radio" name="ukuran" id="ukuranS" value="S" required>
-        <label class="form-check-label" for="ukuranS">S</label>
-    </div>
+  <div class="form-check">
+    <input class="form-check-input" type="radio" name="ukuran" id="ukuranAllSize" value="All Size" required>
+    <label class="form-check-label" for="ukuranAllSize">All Size</label>
+</div>
 
-    <div class="form-check">
-        <input class="form-check-input" type="radio" name="ukuran" id="ukuranM" value="M">
-        <label class="form-check-label" for="ukuranM">M</label>
-    </div>
-
-    <div class="form-check">
-        <input class="form-check-input" type="radio" name="ukuran" id="ukuranL" value="L">
-        <label class="form-check-label" for="ukuranL">L</label>
-    </div>
-
-    <div class="form-check mb-3">
-        <input class="form-check-input" type="radio" name="ukuran" id="ukuranXL" value="XL">
-        <label class="form-check-label" for="ukuranXL">XL</label>
-    </div>
 
     <div class="mb-3">
         <label>Catatan</label>
         <textarea name="catatan" class="form-control" rows="3"></textarea>
     </div>
 
-    <div class="mb-3">
-        <label>Tanda Tangan</label>
-        <canvas id="canvasTTD" style="width:100%; height:150px;"></canvas>
-        <input type="hidden" name="ttd" id="ttdInput">
-        <button type="button" class="btn btn-secondary mt-2" onclick="clearCanvas()">Hapus</button>
-    </div>
 
     <div class="d-flex gap-2 justify-content-end mt-3 flex-wrap">
         <button type="button" class="btn btn-primary btn-sm" onclick="prevStep()">
@@ -359,54 +339,4 @@ $hasCatatan = true;
             updateProgress(1);
         });
     }
-
-   // Canvas TTD
-let canvas = document.getElementById('canvasTTD');
-let ctx = canvas.getContext('2d');
-let drawing = false;
-
-canvas.addEventListener('mousedown', startDraw);
-canvas.addEventListener('mouseup', endDraw);
-canvas.addEventListener('mousemove', draw);
-
-function getPos(e) {
-    const rect = canvas.getBoundingClientRect();
-    return {
-        x: (e.clientX - rect.left) * (canvas.width / rect.width),
-        y: (e.clientY - rect.top) * (canvas.height / rect.height)
-    };
-}
-
-function startDraw(e) {
-    drawing = true;
-    const pos = getPos(e);
-    ctx.beginPath();
-    ctx.moveTo(pos.x, pos.y);
-}
-
-function endDraw() {
-    drawing = false;
-    document.getElementById('ttdInput').value = canvas.toDataURL();
-    ctx.beginPath();
-}
-
-function draw(e) {
-    if (!drawing) return;
-    const pos = getPos(e);
-
-    ctx.lineWidth = 2;
-    ctx.lineCap = 'round';
-    ctx.strokeStyle = '#980517';
-
-    ctx.lineTo(pos.x, pos.y);
-    ctx.stroke();
-    ctx.beginPath();
-    ctx.moveTo(pos.x, pos.y);
-}
-
-function clearCanvas() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    document.getElementById('ttdInput').value = '';
-}
-
 </script>

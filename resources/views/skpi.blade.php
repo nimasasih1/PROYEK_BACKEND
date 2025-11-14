@@ -220,20 +220,7 @@ $hasCatatan = true;
             </div>
 
             <!-- Tanda Tangan -->
-            <div class="mb-2">
-                <label class="form-label">Tanda Tangan</label>
-                <canvas id="signature-pad" width="600" height="120" style="border:1px solid #980517; border-radius:6px;"></canvas>
-                <div class="mt-1 d-flex gap-2">
-                    <button type="button" id="clear-signature" class="btn btn-warning btn-sm">
-                        <i class="bi bi-trash"></i> Clear
-                    </button>
-                    <button type="button" id="save-signature" class="btn btn-primary btn-sm">
-                        <i class="bi bi-save"></i> Simpan TTD
-                    </button>
-                </div>
-                <input type="hidden" name="ttd_mahasiswa" id="ttd_mahasiswa">
-                <small id="ttd-status" class="text-success" style="display:none;">Tanda tangan tersimpan!</small>
-            </div>
+           
 
             <!-- Upload File SKPI -->
             <div class="mb-2">
@@ -249,57 +236,7 @@ $hasCatatan = true;
 
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
         <script>
-            const canvas = document.getElementById('signature-pad');
-            const ctx = canvas.getContext('2d');
-            let drawing = false;
 
-            // Gambar di canvas
-            canvas.addEventListener('mousedown', () => drawing = true);
-            canvas.addEventListener('mouseup', () => {
-                drawing = false;
-                ctx.beginPath();
-            });
-            canvas.addEventListener('mouseout', () => {
-                drawing = false;
-                ctx.beginPath();
-            });
-            canvas.addEventListener('mousemove', draw);
-
-            function draw(e) {
-                if (!drawing) return;
-                const rect = canvas.getBoundingClientRect();
-                ctx.lineWidth = 2;
-                ctx.lineCap = 'round';
-                ctx.strokeStyle = '#980517';
-                ctx.lineTo(e.clientX - rect.left, e.clientY - rect.top);
-                ctx.stroke();
-                ctx.beginPath();
-                ctx.moveTo(e.clientX - rect.left, e.clientY - rect.top);
-            }
-
-            // Tombol clear
-            document.getElementById('clear-signature').addEventListener('click', () => {
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
-                document.getElementById('ttd_mahasiswa').value = '';
-                document.getElementById('ttd-status').style.display = 'none';
-            });
-
-            // Tombol simpan sementara
-            document.getElementById('save-signature').addEventListener('click', () => {
-                const dataURL = canvas.toDataURL('image/png');
-                const blank = document.createElement('canvas');
-                blank.width = canvas.width;
-                blank.height = canvas.height;
-
-                if (dataURL === blank.toDataURL()) {
-                    alert('Silakan buat tanda tangan terlebih dahulu!');
-                    return;
-                }
-
-                document.getElementById('ttd_mahasiswa').value = dataURL;
-                document.getElementById('ttd-status').style.display = 'inline';
-                console.log('Tanda tangan tersimpan sementara.');
-            });
         </script>
 
     </div>

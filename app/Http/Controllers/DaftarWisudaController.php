@@ -107,7 +107,6 @@ class DaftarWisudaController extends Controller
         $request->validate([
             'tgl_pendaftaran' => 'required|date',
             'ukuran'          => 'required|string|max:10',
-            'ttd'             => 'required|string',
         ]);
 
         $cek = PendaftaranWisuda::where('id_mahasiswa', $mahasiswa->id_mahasiswa)->first();
@@ -125,7 +124,6 @@ class DaftarWisudaController extends Controller
             'id_pendaftaran' => $pendaftaran->id_pendaftaran,
             'ukuran'         => $request->ukuran,
             'catatan'        => $request->catatan,
-            'ttd'            => $request->ttd,
         ]);
 
         return redirect()->route('daftar_wisuda.index')
@@ -145,7 +143,6 @@ class DaftarWisudaController extends Controller
         $request->validate([
             'tgl_pendaftaran' => 'required|date',
             'ukuran'          => 'required|string|max:10',
-            'ttd'             => 'required|string',
         ]);
 
         $cek = PendaftaranWisuda::where('id_mahasiswa', $mahasiswa->id_mahasiswa)->first();
@@ -163,7 +160,6 @@ class DaftarWisudaController extends Controller
             'id_pendaftaran' => $pendaftaran->id_pendaftaran,
             'ukuran'         => $request->ukuran,
             'catatan'        => $request->catatan,
-            'ttd'            => $request->ttd,
         ]);
 
         return redirect()->route('daftar_wisuda.index')
@@ -182,7 +178,7 @@ class DaftarWisudaController extends Controller
         $request->validate([
             'tgl_pendaftaran' => 'required|date',
             'ukuran'          => 'required|string|max:10',
-            'ttd'             => 'required|string',
+            
         ]);
 
         $cek = PendaftaranWisuda::where('id_mahasiswa', $mahasiswa->id_mahasiswa)->first();
@@ -200,7 +196,7 @@ class DaftarWisudaController extends Controller
             'id_pendaftaran' => $pendaftaran->id_pendaftaran,
             'ukuran'         => $request->ukuran,
             'catatan'        => $request->catatan,
-            'ttd'            => $request->ttd,
+            
         ]);
 
         return redirect()->route('daftar_wisuda.index')
@@ -219,7 +215,7 @@ class DaftarWisudaController extends Controller
         $request->validate([
             'tgl_pendaftaran' => 'required|date',
             'ukuran'          => 'required|string|max:10',
-            'ttd'             => 'required|string',
+            
         ]);
 
         $cek = PendaftaranWisuda::where('id_mahasiswa', $mahasiswa->id_mahasiswa)->first();
@@ -237,7 +233,7 @@ class DaftarWisudaController extends Controller
             'id_pendaftaran' => $pendaftaran->id_pendaftaran,
             'ukuran'         => $request->ukuran,
             'catatan'        => $request->catatan,
-            'ttd'            => $request->ttd,
+            
         ]);
 
         return redirect()->route('daftar_wisuda.index')
@@ -294,7 +290,6 @@ class DaftarWisudaController extends Controller
             'tgl_pendaftaran' => 'required|date',
             'ukuran'          => 'required|string|max:10',
             'catatan'         => 'nullable|string',
-            'ttd'             => 'nullable|file|mimes:jpg,jpeg,png|max:2048',
         ]);
 
         // Update tanggal pendaftaran
@@ -311,10 +306,7 @@ class DaftarWisudaController extends Controller
             ];
 
             // Upload ttd jika ada
-            if ($request->hasFile('ttd')) {
-                $path = $request->file('ttd')->store('ttd', 'public');
-                $dataToga['ttd'] = '/storage/' . $path;
-            }
+           
 
             $toga->update($dataToga);
         }

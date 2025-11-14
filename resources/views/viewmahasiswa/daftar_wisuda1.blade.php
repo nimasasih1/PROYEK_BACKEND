@@ -21,7 +21,7 @@
 
   <!-- Tambahkan wrapper scroll di sini -->
   <div class="table-responsive" style="overflow-x: auto; max-width: 100%;">
-    <table id="wisudaTable" class="table table-bordered display nowrap" style="width: 100%; min-width: 1800px;">
+    <table id="wisudaTable" class="table table-bordered display nowrap" style="width: 100%; min-width: 1400px;">
       <thead class="table-dark">
         <tr>
           <th>No</th>
@@ -33,22 +33,28 @@
           <th>Tanggal Pendaftaran</th>
           <th>Ukuran</th>
           <th>Catatan</th>
-          <th>Tanda Tangan</th>
           <th>Finance</th>
           <th>Perpus</th>
           <th>Fakultas</th>
           <th>BAAK</th>
-          <th>Catatan Finance</th>
-          <th>Catatan Library</th>
-          <th>Catatan Fakulty</th>
+          <th>Catatan</th>
           <th>Catatan BAAK</th>
           <th>Status</th>
           <th>Aksi</th>
         </tr>
       </thead>
-<tbody>
-    @foreach ($data->unique('id_pendaftaran') as $pendaftaran)
-
+      <tbody>
+        @foreach ($data->unique('id_pendaftaran') as $pendaftaran)
+          @php
+            // Cek apakah semua validasi sudah selesai
+            $isSelesai = $pendaftaran->is_valid_finance && 
+                         $pendaftaran->is_valid_perpus && 
+                         $pendaftaran->is_valid_fakultas && 
+                         $pendaftaran->is_valid_baak;
+          @endphp
+          
+          {{-- Hanya tampilkan data yang BELUM selesai --}}
+          @if(!$isSelesai)
             <tr>
                 <td>{{ $loop->iteration }}</td>
                 <td>{{ $pendaftaran->mahasiswa->nama_mahasiswa }}</td>
@@ -59,13 +65,7 @@
                 <td>{{ $pendaftaran->tgl_pendaftaran ?? '-' }}</td>
                 <td>{{ $pendaftaran->toga->ukuran ?? '-' }}</td>
                 <td>{{ $pendaftaran->toga->catatan ?? '-' }}</td>
-                <td>
-                    @if (!empty($pendaftaran->toga->ttd))
-                    <img src="{{ $pendaftaran->toga->ttd }}" alt="Tanda Tangan" width="150">
-                    @else
-                    -
-                    @endif
-                </td>
+                
 
                 <!-- VALIDASI FINANCE -->
                 <td>
@@ -75,7 +75,7 @@
                         <input type="hidden" name="field" value="is_valid_finance">
                         <input type="checkbox" name="is_valid_finance" value="1"
                             onchange="this.form.submit()"
-                            {{ $pendaftaran->is_valid_finance ? 'checked' : '' }}>
+                            {{ $pendaftaran->is_valid_finance ? 'checked' : '' }} disabled>
                     </form>
                 </td>
 
@@ -87,7 +87,7 @@
                         <input type="hidden" name="field" value="is_valid_perpus">
                         <input type="checkbox" name="is_valid_perpus" value="1"
                             onchange="this.form.submit()"
-                            {{ $pendaftaran->is_valid_perpus ? 'checked' : '' }}>
+                            {{ $pendaftaran->is_valid_perpus ? 'checked' : '' }} disabled>
                     </form>
                 </td>
 
@@ -99,7 +99,7 @@
                         <input type="hidden" name="field" value="is_valid_fakultas">
                         <input type="checkbox" name="is_valid_fakultas" value="1"
                             onchange="this.form.submit()"
-                            {{ $pendaftaran->is_valid_fakultas ? 'checked' : '' }}>
+                            {{ $pendaftaran->is_valid_fakultas ? 'checked' : '' }} disabled>
                     </form>
                 </td>
 
@@ -115,21 +115,36 @@
                     </form>
                 </td>
 
-                <!-- ===================== CATATAN FINANCE ===================== -->
+                <!-- ===================== CATATAN DROPDOWN (FINANCE, PERPUS, FAKULTAS) ===================== -->
                 <td>
-                    <form action="{{ route('viewmahasiswa.wisuda1.update', $pendaftaran->id_pendaftaran) }}" method="POST" class="d-flex align-items-start gap-2" style="width: 500px;">
-                        @csrf
-                        @method('PUT')
-                        <input type="hidden" name="field" value="catatan_finance">
-                        <textarea name="catatan_finance" class="form-control" rows="2" placeholder="Tulis catatan finance..." style="flex:2; min-width: 350px;">{{ $pendaftaran->catatan_finance ?? '' }}</textarea>
-                        <div class="d-flex flex-column gap-1">
-                            <button type="submit" class="btn btn-sm btn-primary">Kirim</button>
-                            <button type="button" class="btn btn-sm btn-info" data-bs-toggle="modal"
-                                data-bs-target="#catatanFinanceModal{{ $pendaftaran->id_pendaftaran }}">
-                                Lihat
-                            </button>
-                        </div>
-                    </form>
+                    <div class="dropdown">
+                        <button class="btn btn-sm btn-secondary dropdown-toggle" type="button" 
+                            id="dropdownCatatan{{ $pendaftaran->id_pendaftaran }}" 
+                            data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="bi bi-pencil-square"></i> Catatan
+                        </button>
+                        <ul class="dropdown-menu" aria-labelledby="dropdownCatatan{{ $pendaftaran->id_pendaftaran }}">
+                            <li>
+                                 <a class="dropdown-item" href="#" data-bs-toggle="modal" 
+                                    data-bs-target="#catatanFakultasModal{{ $pendaftaran->id_pendaftaran }}">
+                                    <i class="bi bi-building"></i> Fakultas
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item" href="#" data-bs-toggle="modal" 
+                                    data-bs-target="#catatanFinanceModal{{ $pendaftaran->id_pendaftaran }}">
+                                    <i class="bi bi-cash-coin"></i> Finance
+                                </a>
+                                
+                            </li>
+                            <li>
+                               <a class="dropdown-item" href="#" data-bs-toggle="modal" 
+                                    data-bs-target="#catatanPerpusModal{{ $pendaftaran->id_pendaftaran }}">
+                                    <i class="bi bi-book"></i> Perpustakaan
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
 
                     <!-- Modal Catatan Finance -->
                     <div class="modal fade" id="catatanFinanceModal{{ $pendaftaran->id_pendaftaran }}" tabindex="-1" aria-labelledby="catatanFinanceLabel{{ $pendaftaran->id_pendaftaran }}" aria-hidden="true">
@@ -140,37 +155,19 @@
                                     @method('PUT')
                                     <input type="hidden" name="field" value="catatan_finance">
                                     <div class="modal-header">
-                                        <h5 class="modal-title" id="catatanFinanceLabel{{ $pendaftaran->id_pendaftaran }}">Catatan Finance</h5>
+                                        <h5 class="modal-title" id="catatanFinanceLabel{{ $pendaftaran->id_pendaftaran }}">
+                                            <i class="bi bi-cash-coin"></i> Catatan Finance
+                                        </h5>
                                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                     </div>
                                     <div class="modal-body">
-                                        <textarea name="catatan_finance" class="form-control" rows="5">{{ $pendaftaran->catatan_finance ?? '' }}</textarea>
+                                        <textarea name="catatan_finance" class="form-control" rows="5" placeholder="Tulis catatan finance..." readonly>{{ $pendaftaran->catatan_finance ?? '' }}</textarea>
                                     </div>
-                                    <div class="modal-footer">
-                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
-                                        <button type="submit" class="btn btn-primary">Simpan</button>
-                                    </div>
+                                    
                                 </form>
                             </div>
                         </div>
                     </div>
-                </td>
-
-                <!-- ===================== CATATAN PERPUS ===================== -->
-                <td>
-                    <form action="{{ route('viewmahasiswa.wisuda1.update', $pendaftaran->id_pendaftaran) }}" method="POST" class="d-flex align-items-start gap-2" style="width: 500px;">
-                        @csrf
-                        @method('PUT')
-                        <input type="hidden" name="field" value="catatan_perpus">
-                        <textarea name="catatan_perpus" class="form-control" rows="2" placeholder="Tulis catatan perpus..." style="flex:2; min-width: 350px;">{{ $pendaftaran->catatan_perpus ?? '' }}</textarea>
-                        <div class="d-flex flex-column gap-1">
-                            <button type="submit" class="btn btn-sm btn-primary">Kirim</button>
-                            <button type="button" class="btn btn-sm btn-info" data-bs-toggle="modal"
-                                data-bs-target="#catatanPerpusModal{{ $pendaftaran->id_pendaftaran }}">
-                                Lihat
-                            </button>
-                        </div>
-                    </form>
 
                     <!-- Modal Catatan Perpus -->
                     <div class="modal fade" id="catatanPerpusModal{{ $pendaftaran->id_pendaftaran }}" tabindex="-1" aria-labelledby="catatanPerpusLabel{{ $pendaftaran->id_pendaftaran }}" aria-hidden="true">
@@ -181,37 +178,18 @@
                                     @method('PUT')
                                     <input type="hidden" name="field" value="catatan_perpus">
                                     <div class="modal-header">
-                                        <h5 class="modal-title" id="catatanPerpusLabel{{ $pendaftaran->id_pendaftaran }}">Catatan Perpustakaan</h5>
+                                        <h5 class="modal-title" id="catatanPerpusLabel{{ $pendaftaran->id_pendaftaran }}">
+                                            <i class="bi bi-book"></i> Catatan Perpustakaan
+                                        </h5>
                                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                     </div>
                                     <div class="modal-body">
-                                        <textarea name="catatan_perpus" class="form-control" rows="5">{{ $pendaftaran->catatan_perpus ?? '' }}</textarea>
-                                    </div>
-                                    <div class="modal-footer">
-                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
-                                        <button type="submit" class="btn btn-primary">Simpan</button>
+                                        <textarea name="catatan_perpus" class="form-control" rows="5" placeholder="Tulis catatan perpustakaan..." readonly>{{ $pendaftaran->catatan_perpus ?? '' }}</textarea>
                                     </div>
                                 </form>
                             </div>
                         </div>
                     </div>
-                </td>
-
-                <!-- ===================== CATATAN FAKULTAS ===================== -->
-                <td>
-                    <form action="{{ route('viewmahasiswa.wisuda1.update', $pendaftaran->id_pendaftaran) }}" method="POST" class="d-flex align-items-start gap-2" style="width: 500px;">
-                        @csrf
-                        @method('PUT')
-                        <input type="hidden" name="field" value="catatan_fakultas">
-                        <textarea name="catatan_fakultas" class="form-control" rows="2" placeholder="Tulis catatan fakultas..." style="flex:2; min-width: 350px;">{{ $pendaftaran->catatan_fakultas ?? '' }}</textarea>
-                        <div class="d-flex flex-column gap-1">
-                            <button type="submit" class="btn btn-sm btn-primary">Kirim</button>
-                            <button type="button" class="btn btn-sm btn-info" data-bs-toggle="modal"
-                                data-bs-target="#catatanFakultasModal{{ $pendaftaran->id_pendaftaran }}">
-                                Lihat
-                            </button>
-                        </div>
-                    </form>
 
                     <!-- Modal Catatan Fakultas -->
                     <div class="modal fade" id="catatanFakultasModal{{ $pendaftaran->id_pendaftaran }}" tabindex="-1" aria-labelledby="catatanFakultasLabel{{ $pendaftaran->id_pendaftaran }}" aria-hidden="true">
@@ -222,15 +200,13 @@
                                     @method('PUT')
                                     <input type="hidden" name="field" value="catatan_fakultas">
                                     <div class="modal-header">
-                                        <h5 class="modal-title" id="catatanFakultasLabel{{ $pendaftaran->id_pendaftaran }}">Catatan Fakultas</h5>
+                                        <h5 class="modal-title" id="catatanFakultasLabel{{ $pendaftaran->id_pendaftaran }}">
+                                            <i class="bi bi-building"></i> Catatan Fakultas
+                                        </h5>
                                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                     </div>
                                     <div class="modal-body">
-                                        <textarea name="catatan_fakultas" class="form-control" rows="5">{{ $pendaftaran->catatan_fakultas ?? '' }}</textarea>
-                                    </div>
-                                    <div class="modal-footer">
-                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
-                                        <button type="submit" class="btn btn-primary">Simpan</button>
+                                        <textarea name="catatan_fakultas" class="form-control" rows="5" placeholder="Tulis catatan fakultas..." readonly>{{ $pendaftaran->catatan_fakultas ?? '' }}</textarea>
                                     </div>
                                 </form>
                             </div>
@@ -240,19 +216,10 @@
 
                 <!-- ===================== CATATAN BAAK ===================== -->
                 <td>
-                    <form action="{{ route('viewmahasiswa.wisuda1.update', $pendaftaran->id_pendaftaran) }}" method="POST" class="d-flex align-items-start gap-2" style="width: 500px;">
-                        @csrf
-                        @method('PUT')
-                        <input type="hidden" name="field" value="catatan_baak">
-                        <textarea name="catatan_baak" class="form-control" rows="2" placeholder="Tulis catatan BAAK..." style="flex:2; min-width: 350px;">{{ $pendaftaran->catatan_baak ?? '' }}</textarea>
-                        <div class="d-flex flex-column gap-1">
-                            <button type="submit" class="btn btn-sm btn-primary">Kirim</button>
-                            <button type="button" class="btn btn-sm btn-info" data-bs-toggle="modal"
-                                data-bs-target="#catatanBaakModal{{ $pendaftaran->id_pendaftaran }}">
-                                Lihat
-                            </button>
-                        </div>
-                    </form>
+                    <button type="button" class="btn btn-sm btn-info" data-bs-toggle="modal"
+                        data-bs-target="#catatanBaakModal{{ $pendaftaran->id_pendaftaran }}">
+                        <i class="bi bi-pencil-square"></i> Catatan BAAK
+                    </button>
 
                     <!-- Modal Catatan BAAK -->
                     <div class="modal fade" id="catatanBaakModal{{ $pendaftaran->id_pendaftaran }}" tabindex="-1" aria-labelledby="catatanBaakLabel{{ $pendaftaran->id_pendaftaran }}" aria-hidden="true">
@@ -267,7 +234,7 @@
                                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                     </div>
                                     <div class="modal-body">
-                                        <textarea name="catatan_baak" class="form-control" rows="5">{{ $pendaftaran->catatan_baak ?? '' }}</textarea>
+                                        <textarea name="catatan_baak" class="form-control" rows="5" placeholder="Tulis catatan BAAK...">{{ $pendaftaran->catatan_baak ?? '' }}</textarea>
                                     </div>
                                     <div class="modal-footer">
                                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
@@ -279,13 +246,9 @@
                     </div>
                 </td>
 
-                <!-- STATUS -->
+                <!-- STATUS - Hanya tampilkan Menunggu -->
                 <td>
-                    @if($pendaftaran->is_valid_finance && $pendaftaran->is_valid_perpus && $pendaftaran->is_valid_fakultas && $pendaftaran->is_valid_baak)
-                    <span class="badge bg-success">Selesai</span>
-                    @else
                     <span class="badge bg-warning">Menunggu</span>
-                    @endif
                 </td>
 
                 <!-- AKSI -->
@@ -297,7 +260,7 @@
                         data-catatan="{{ $pendaftaran->toga->catatan ?? '' }}"
                         data-bs-toggle="modal"
                         data-bs-target="#editWisudaModal">
-                        Edit
+                        <i class="bi bi-pencil"></i>
                     </button>
 
                     <form action="{{ route('wisuda1.destroy', $pendaftaran->id_pendaftaran) }}" method="POST"
@@ -305,12 +268,13 @@
                         onsubmit="return confirm('Yakin ingin menghapus data ini?')">
                         @csrf
                         @method('DELETE')
-                        <button type="submit" class="btn btn-sm btn-danger">Hapus</button>
+                        <button type="submit" class="btn btn-sm btn-danger"><i class="bi bi-trash"></i></button>
                     </form>
                 </td>
             </tr>
-            @endforeach
-        </tbody>
+          @endif
+        @endforeach
+      </tbody>
     </table>
   </div>
 </div>
@@ -338,11 +302,8 @@
             <label for="edit_ukuran" class="form-label">Ukuran Toga</label>
             <select class="form-select" id="edit_ukuran" name="ukuran" required>
               <option value="">Pilih Ukuran</option>
-              <option value="S">S</option>
-              <option value="M">M</option>
-              <option value="L">L</option>
-              <option value="XL">XL</option>
-              <option value="XXL">XXL</option>
+              <option value="All Size">All Size</option>
+
             </select>
           </div>
 

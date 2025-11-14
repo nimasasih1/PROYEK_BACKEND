@@ -704,7 +704,7 @@ if (Auth::check()) {
     </div>
   </section>
 
-  --}}
+
 
   <!-- FOOTER -->
   <footer class="content-footer footer bg-footer-theme">

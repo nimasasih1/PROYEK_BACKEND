@@ -29,7 +29,6 @@
                 <th>Tanggal Pendaftaran</th>
                 <th>Ukuran</th>
                 <th>Catatan</th>
-                <th>Tanda Tangan</th>
                 <th>Fakultas</th>
                 <th>Catataan Fakultas</th>
                 <th>Status</th>
@@ -48,13 +47,6 @@
                 <td>{{ $pendaftaran->tgl_pendaftaran ?? '-' }}</td>
                 <td>{{ $pendaftaran->toga->ukuran ?? '-' }}</td>
                 <td>{{ $pendaftaran->toga->catatan ?? '-' }}</td>
-                <td>
-                    @if (!empty($pendaftaran->toga->ttd))
-                    <img src="{{ $pendaftaran->toga->ttd }}" alt="Tanda Tangan" width="150">
-                    @else
-                    -
-                    @endif
-                </td>
                 <td>
                     <form action="{{ route('viewmahasiswa.wisuda1.update', $pendaftaran->id_pendaftaran) }}" method="POST">
                         @csrf

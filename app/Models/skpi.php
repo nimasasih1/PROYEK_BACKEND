@@ -12,7 +12,6 @@ class Skpi extends Model
         'id_mahasiswa',
         'tgl_pengajuan_mahasiswa',
         'nama_departement_biro',
-        'ttd_mahasiswa',
         'ttd_admin',
         'jenjang_mahasiswa',
         'no_hp_mahasiswa',

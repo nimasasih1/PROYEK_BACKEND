@@ -29,7 +29,6 @@
                 <th>Tanggal Pendaftaran</th>
                 <th>Ukuran</th>
                 <th>Catatan</th>
-                <th>Tanda Tangan</th>
                 <th>Perpustakaan</th>
                 <th>Catatan Perpustakaan</th>
                 <th>Status</th>
@@ -47,13 +46,6 @@
                 <td>{{ $pendaftaran->tgl_pendaftaran ?? '-' }}</td>
                 <td>{{ $pendaftaran->toga->ukuran ?? '-' }}</td>
                 <td>{{ $pendaftaran->toga->catatan ?? '-' }}</td>
-                <td>
-                    @if (!empty($pendaftaran->toga->ttd))
-                        <img src="{{ $pendaftaran->toga->ttd }}" alt="Tanda Tangan" width="150">
-                    @else
-                        -
-                    @endif
-                </td>
 
                 <!-- Checkbox Perpustakaan -->
                 <td>
@@ -79,10 +71,10 @@
 
                         <!-- Tombol Kirim & Lihat -->
                         <div class="d-flex flex-column gap-1">
-                            <button type="submit" class="btn btn-sm btn-primary">Kirim</button>
+                            <button type="submit" class="btn btn-sm btn-primary"><i class="bi bi-send"></i></button>
                             <button type="button" class="btn btn-sm btn-info" data-bs-toggle="modal"
                                 data-bs-target="#catatanPerpusModal{{ $pendaftaran->id_pendaftaran }}">
-                                Lihat
+                                <i class="bi bi-eye"></i>
                             </button>
                         </div>
                     </form>

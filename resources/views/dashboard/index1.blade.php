@@ -17,7 +17,7 @@
       <thead>
         <tr>
           <th>ID</th>
-          <th>Jadwal Undangan</th>
+          <th>Jadwal Pelaksanaan</th>
           <th>Lokasi</th>
           <th>Jumlah Wisudawan</th>
           <th>Jadwal Wisuda</th>
