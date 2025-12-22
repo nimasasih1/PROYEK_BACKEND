@@ -30,6 +30,68 @@
   <!-- Helpers -->
   <script src="../assets/vendor/js/helpers.js"></script>
   <script src="../assets/js/config.js"></script>
+
+  <style>
+    .card {
+      max-width: 450px;
+      margin: 0 auto;
+    }
+
+    .app-brand {
+      gap: 0.75rem !important;
+    }
+
+    .app-brand-link {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      text-decoration: none;
+    }
+
+    .app-brand-logo img {
+      height: 2.5rem;
+      width: auto;
+    }
+
+    .brand-text-wrapper {
+      display: flex;
+      flex-direction: column;
+      gap: 0.125rem;
+    }
+
+    .app-brand-text {
+      font-size: 1.125rem;
+      font-weight: 700;
+      line-height: 1.2;
+      margin: 0;
+    }
+
+    .university-name {
+      font-size: 0.75rem;
+      color: #697a8d;
+      font-weight: 500;
+      margin: 0;
+      line-height: 1.2;
+    }
+
+    @media (max-width: 575.98px) {
+      .card {
+        max-width: 100%;
+      }
+
+      .app-brand-logo img {
+        height: 2rem;
+      }
+
+      .app-brand-text {
+        font-size: 1rem;
+      }
+
+      .university-name {
+        font-size: 0.65rem;
+      }
+    }
+  </style>
 </head>
 <body style="background: url('{{ asset('images/bg.png') }}') no-repeat center center fixed; background-size: cover;">
 
@@ -40,17 +102,19 @@
         <div class="card-body">
           <!-- Logo -->
           <div class="app-brand justify-content-center">
-            <a href="index.html" class="app-brand-link gap-2">
-             <span class="app-brand-logo demo">
-    <img src="{{ asset('images/logo.png') }}" alt="Logo Gradys" style="height:1.5rem; width:auto;">
-</span>
-
-              <span class="app-brand-text demo text-body fw-bolder">GRAD-System</span>
+            <a href="index.html" class="app-brand-link">
+              <span class="app-brand-logo demo">
+                <img src="{{ asset('images/logo.png') }}" alt="Logo Gradys">
+              </span>
+              <div class="brand-text-wrapper">
+                <span class="app-brand-text demo text-body fw-bolder">GRAD-SYSTEM</span>
+                <span class="university-name">HORIZON UNIVERSITY INDONESIA</span>
+              </div>
             </a>
           </div>
           <!-- /Logo -->
 
-          <h4 class="mb-2">Selamat Datang di Sistem Wisuda Universitas Horizon Indonesia!🎓</h4>
+          <h5 class="mb-2">Selamat Datang Calon Wisudawan!🎓</h5>
           <p class="mb-4">Silahkan Masuk ke Akun Anda!</p>
 
           <!-- Session Success -->
@@ -59,49 +123,62 @@
           @endif
 
           <!-- Login Form -->
-          <form method="POST" action="{{ route('login.submit') }}">
-            @csrf
+<form method="POST" action="{{ route('login.submit') }}">
+  @csrf
 
-            <div class="mb-3">
-              <label for="username" class="form-label">Username / NIM</label>
-              <input type="text" name="username" class="form-control" id="username" required autofocus />
-            </div>
+  <div class="mb-3">
+    <label for="username" class="form-label">Username / NIM</label>
+    <input type="text" name="username" class="form-control @error('username') is-invalid @enderror" 
+           id="username" value="{{ old('username') }}" autofocus />
+    @error('username')
+      <div class="invalid-feedback">{{ $message }}</div>
+    @enderror
+  </div>
 
-            <div class="mb-3 form-password-toggle">
-              <label for="password" class="form-label">Password</label>
-              <div class="input-group input-group-merge">
-                <input type="password" name="password" class="form-control" id="password" placeholder="&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;" required />
-                <span class="input-group-text cursor-pointer"><i class="bx bx-hide"></i></span>
-              </div>
-            </div>
+  <div class="mb-3 form-password-toggle">
+    <label for="password" class="form-label">Password</label>
+    <div class="input-group input-group-merge">
+      <input type="password" name="password" class="form-control @error('password') is-invalid @enderror" 
+             id="password" placeholder="&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;" />
+      <span class="input-group-text cursor-pointer"><i class="bx bx-hide"></i></span>
+    </div>
+    @error('password')
+      <div class="invalid-feedback d-block">{{ $message }}</div>
+    @enderror
+  </div>
 
-            <div class="mb-3">
-              <label class="form-label">Captcha</label>
-              <div class="d-flex align-items-center mb-2">
-                <img src="{{ captcha_src('flat') }}" alt="captcha" id="captcha-image">
-                <button type="button" onclick="refreshCaptcha()" class="btn btn-outline-secondary btn-sm ms-2">↻</button>
-              </div>
-              <input type="text" name="captcha" class="form-control" placeholder="Masukkan teks di atas" required>
-            </div>
+  <div class="mb-3">
+    <label class="form-label">Captcha</label>
+    <div class="d-flex align-items-center mb-2">
+      <img src="{{ captcha_src('flat') }}" alt="captcha" id="captcha-image">
+      <button type="button" onclick="refreshCaptcha()" class="btn btn-outline-secondary btn-sm ms-2">↻</button>
+    </div>
+    <input type="text" name="captcha" class="form-control @error('captcha') is-invalid @enderror" 
+           placeholder="Masukkan teks di atas">
+    @error('captcha')
+      <div class="invalid-feedback">{{ $message }}</div>
+    @enderror
+  </div>
 
-            <div class="mb-3">
-              <button type="submit" class="btn btn-primary d-grid w-100">Login</button>
-            </div>
+  <div class="mb-3">
+    <button type="submit" class="btn btn-primary d-grid w-100">Login</button>
+  </div>
 
-            @if($errors->any())
-              <div class="alert alert-danger mt-2">
-                @foreach($errors->all() as $error)
-                  <p class="mb-0">{{ $error }}</p>
-                @endforeach
-              </div>
-            @endif
-          </form>
+  <!-- Fallback untuk error lainnya -->
+  @if($errors->any() && !$errors->has('username') && !$errors->has('password') && !$errors->has('captcha'))
+    <div class="alert alert-danger mt-2">
+      @foreach($errors->all() as $error)
+        <p class="mb-0">{{ $error }}</p>
+      @endforeach
+    </div>
+  @endif
+</form>
 
-         <!--
+
           <p class="text-center mt-4">
             <span>Belum Terdaftar?</span>
             <a href="{{ route('register.form') }}"><span>Register</span></a>
-          </p>-->
+          </p>
           
 
 

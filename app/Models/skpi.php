@@ -8,23 +8,41 @@ class Skpi extends Model
 {
     protected $table = 'skpi';
     protected $primaryKey = 'id_skpi';
+
     protected $fillable = [
         'id_mahasiswa',
         'tgl_pengajuan_mahasiswa',
-        'nama_departement_biro',
-        'ttd_mahasiswa',
-        'ttd_admin',
-        'jenjang_mahasiswa',
-        'no_hp_mahasiswa',
-        'email_mahasiswa',
-        'alamat_mahasiswa',
-        'judul',
-        'tanggal_terbit',
+        'tempat_lahir',
+        'tahun_lulus',
+        'no_ijazah',
+        'gelar',
+        'sk_pendirian_perti',
+        'persyaratan_penerimaan',
+        'nama_perti',
+        'bahasa_pengantar_kuliah',
+        'sistem_penilaian',
+        'kelas',
+        'lama_studi_rg',
+        'jenjang_pd_lanjutan',
+        'jenjang_kualif_kkn1',
+        'status_profesi',
+        'penguasaan_pengetahuan',
+        'aktiv_pres_penghargaan',
+        'magang',
+        'jenjangpend_syaratbelajar',
+        'sks_lamastudi',
+        'kota',
+        'tanggal_skpi',
+        'kemampuan_kerja',
+        'info_kkni',
+        'file_pdf',
     ];
 
-    // relasi ke mahasiswa
     public function mahasiswa()
     {
         return $this->belongsTo(Mahasiswa::class, 'id_mahasiswa', 'id_mahasiswa');
     }
 }
+
+
+    // Relasi ke mahasiswa

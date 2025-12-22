@@ -6196,7 +6196,7 @@ a.invert-bg-dark:hover, a.invert-bg-dark:focus {
 }
 
 .table-dark {
-  --bs-table-bg: #233446;
+  --bs-table-bg: #980517;
   --bs-table-striped-bg: #2a3a4c;
   --bs-table-striped-color: #fff;
   --bs-table-active-bg: #394859;
@@ -6207,7 +6207,7 @@ a.invert-bg-dark:hover, a.invert-bg-dark:focus {
   border-color: #394859;
 }
 .table-dark th {
-  border-bottom-color: #394859 !important;
+  border-bottom-color: #980517 !important;
 }
 .table-dark .btn-icon {
   color: #fff;
@@ -6228,7 +6228,7 @@ a.invert-bg-dark:hover, a.invert-bg-dark:focus {
   letter-spacing: 1px;
 }
 .table:not(.table-dark) th {
-  color: #566a7f;
+  color: #ffffff;
 }
 
 .table-border-bottom-0 tr:last-child td,

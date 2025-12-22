@@ -37,11 +37,7 @@
                         <textarea class="form-control" id="edit_alamat" name="alamat_mahasiswa" required></textarea>
                     </div>
 
-                    <div class="mb-3">
-                        <label for="edit_ttd" class="form-label">Tanda Tangan</label>
-                        <input type="file" class="form-control" id="edit_ttd" name="ttd_mahasiswa">
-                        <small>Biarkan kosong jika tidak ingin mengganti</small>
-                    </div>
+                  
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>

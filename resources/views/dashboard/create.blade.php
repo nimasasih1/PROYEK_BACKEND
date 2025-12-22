@@ -7,8 +7,8 @@
     <div class="modal-dialog modal-lg modal-dialog-centered">
       <div class="modal-content border-0 rounded-4 shadow">
         <div class="modal-header text-white" style="background-color: #800000; border-top-left-radius: 1rem; border-top-right-radius: 1rem;">
-          <h5 class="modal-title" id="tambahInfoModalLabel">
-            <i class="bi bi-mortarboard-fill me-2"></i>Tambah Informasi Wisuda
+          <h5 class="modal-title text-white" id="tambahInfoModalLabel">
+            <i class="bi bi-mortarboard-fill me-2 text-white"></i>Tambah Informasi Wisuda
           </h5>
           <a href="{{ url('/dashboard/index1') }}" class="btn-close btn-close-white" aria-label="Close"></a>
         </div>
@@ -17,10 +17,6 @@
           @csrf
           <div class="modal-body">
             <div class="row g-3">
-              <div class="col-md-6">
-                <label class="form-label fw-semibold">Jadwal Undangan</label>
-                <input type="date" name="jadwal_undangan" class="form-control" required>
-              </div>
 
               <div class="col-md-6">
                 <label class="form-label fw-semibold">Lokasi</label>
@@ -42,10 +38,7 @@
                 <textarea name="informasi_baak" class="form-control" rows="3" placeholder="Masukkan informasi resmi dari BAAK..."></textarea>
               </div>
 
-              <div class="col-12">
-                <label class="form-label fw-semibold">Info Lulusan</label>
-                <textarea name="info_lulusan" class="form-control" rows="3" placeholder="Masukkan informasi tambahan untuk lulusan..."></textarea>
-              </div>
+          
             </div>
           </div>
 

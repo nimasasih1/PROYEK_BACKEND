@@ -13,7 +13,9 @@ class User extends Authenticatable
     protected $fillable = [
         'username',  // kode unik atau NIM
         'password',
-        'role',      // mahasiswa, admin, baak, dll
+        'role',
+        'email', 
+        'password_hint_last_char',     // mahasiswa, admin, baak, dll
     ];
 
     protected $hidden = [

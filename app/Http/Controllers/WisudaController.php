@@ -165,4 +165,11 @@ class WisudaController extends Controller
             return redirect()->back()->with('error', 'Gagal menghapus data: ' . $e->getMessage());
         }
     }
+
+    public function print($id)
+{
+    $pendaftaran = PendaftaranWisuda::with(['mahasiswa', 'toga'])->findOrFail($id);
+    
+    return view('viewmahasiswa.wisuda1_print', compact('pendaftaran'));
+}
 }
