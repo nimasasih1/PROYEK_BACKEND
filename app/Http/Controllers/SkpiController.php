@@ -197,6 +197,7 @@ class SkpiController extends Controller
 /**
  * Tampilkan halaman print SKPI
  */
+<<<<<<< HEAD
 public function print($id)
 {
     // Ambil data SKPI beserta relasi mahasiswa
@@ -204,5 +205,14 @@ public function print($id)
     
     // Return view print
     return view('skpi.print', compact('data'));
+=======
+// Tambahkan method ini di SkpiController kamu
+
+public function print($id)
+{
+    $skpi = Skpi::with('mahasiswa')->findOrFail($id);
+    
+    return view('skpi.print', compact('skpi'));
+>>>>>>> 5a9dfefd4a1c4645d1b8cba01f9acf03691b6b91
 }
 }

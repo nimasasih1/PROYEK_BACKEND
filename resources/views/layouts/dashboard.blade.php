@@ -190,6 +190,19 @@
                   <div data-i18n="Profile">Profil</div>
                 </a>
               </li>
+<<<<<<< HEAD
+=======
+
+              <li class="menu-item">
+                <form method="POST" action="{{ route('logout') }}">
+                  @csrf
+                  <button type="submit" class="menu-link" style="display: flex; align-items: center; border: none; background: none; padding: 0; cursor: pointer;">
+                    <i class="menu-icon tf-icons bx bx-log-out"></i>
+                    <div data-i18n="Logout" style="margin-left: 8px;">Logout</div>
+                  </button>
+                </form>
+              </li>
+>>>>>>> 5a9dfefd4a1c4645d1b8cba01f9acf03691b6b91
             </ul>
           </li>
         </ul>
@@ -240,9 +253,15 @@
                     <hr class="dropdown-divider">
                   </li>
                   <li>
+<<<<<<< HEAD
                     <form id="logoutForm" method="POST" action="{{ route('logout') }}">
                       @csrf
                       <button type="button" id="logoutBtn" class="dropdown-item text-danger">
+=======
+                    <form method="POST" action="{{ route('logout') }}">
+                      @csrf
+                      <button type="submit" class="dropdown-item text-danger">
+>>>>>>> 5a9dfefd4a1c4645d1b8cba01f9acf03691b6b91
                         <i class="bx bx-log-out me-2"></i> Logout
                       </button>
                     </form>
@@ -276,6 +295,7 @@
       </div>
       <!-- / Layout page -->
     </div>
+<<<<<<< HEAD
 
     <!-- Overlay -->
     <div class="layout-overlay layout-menu-toggle"></div>
@@ -302,6 +322,12 @@
     });
   </script>
   @endpush
+=======
+
+    <!-- Overlay -->
+    <div class="layout-overlay layout-menu-toggle"></div>
+  </div>
+>>>>>>> 5a9dfefd4a1c4645d1b8cba01f9acf03691b6b91
 
   <!-- Bootstrap JS bundle -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>

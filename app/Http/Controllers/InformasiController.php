@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 class InformasiController extends Controller
 {
     public function index()
+<<<<<<< HEAD
 {
     $data = Informasi::all();
     $mediaWisuda = \App\Models\MediaWisuda::orderBy('urutan')->get();
@@ -17,6 +18,12 @@ class InformasiController extends Controller
     
     return view('dashboard.index1', compact('data', 'mediaWisuda', 'testimoni', 'statistik'));
 }
+=======
+    {
+        $data = Informasi::all();
+        return view('dashboard.index1', compact('data'));
+    }
+>>>>>>> 5a9dfefd4a1c4645d1b8cba01f9acf03691b6b91
 
     // Simpan data baru
     public function store(Request $request)

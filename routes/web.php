@@ -10,7 +10,11 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DaftarWisudaController;
 use App\Http\Controllers\ForgotPasswordController;
 use App\Http\Controllers\WisudaController;
+<<<<<<< HEAD
 use App\Http\Controllers\SyaratKetentuanController;
+=======
+use App\Http\Controllers\SyaratKetentuanControllers;
+>>>>>>> 5a9dfefd4a1c4645d1b8cba01f9acf03691b6b91
 use App\Http\Controllers\ImportController;
 use App\Http\Controllers\UserImportController;
 use App\Http\Controllers\MahasiswaImportController;
@@ -37,9 +41,15 @@ Route::middleware(['auth'])->group(function () {
     })->name('beranda');
 
     Route::get('/syarat-ketentuan', function () {
+<<<<<<< HEAD
         $hasCatatan = false;
         return view('syarat-ketentuan', compact('hasCatatan'));
     })->name('syarat-ketentuan');
+=======
+    $hasCatatan = false; // Tambahkan ini!
+    return view('syarat-ketentuan', compact('hasCatatan'));
+})->name('syarat-ketentuan');
+>>>>>>> 5a9dfefd4a1c4645d1b8cba01f9acf03691b6b91
 
     Route::get('/profil-mahasiswa', [MahasiswaController::class, 'show'])->name('profil_mahasiswa.show');
     Route::post('/profil-mahasiswa', [MahasiswaController::class, 'store'])->name('profil_mahasiswa.store');
@@ -64,6 +74,11 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/kontak', fn() => view('kontak'))->name('kontak');
 
     Route::post('/kesan/store', [MahasiswaController::class, 'storeKesan'])->name('kesan.store');
+<<<<<<< HEAD
+=======
+
+    
+>>>>>>> 5a9dfefd4a1c4645d1b8cba01f9acf03691b6b91
 });
 
 
@@ -109,11 +124,19 @@ Route::middleware(['auth'])->group(function () {
     Route::put('/dashboard/qna/{id}', [InformasiController::class, 'qnaUpdate'])->name('qna.update');
     Route::delete('/dashboard/qna/{id}', [InformasiController::class, 'qnaDestroy'])->name('qna.delete');
 
+<<<<<<< HEAD
     Route::get('/dashboard/syarat', [SyaratKetentuanController::class, 'syaratIndex'])->name('dashboard.syarat');
     Route::post('/dashboard/syarat/store', [SyaratKetentuanController::class, 'syaratStore'])->name('syarat.store');
     Route::get('/dashboard/syarat/{id}', [SyaratKetentuanController::class, 'syaratShow'])->name('syarat.show');
     Route::put('/dashboard/syarat/{id}', [SyaratKetentuanController::class, 'syaratUpdate'])->name('syarat.update');
     Route::delete('/dashboard/syarat/{id}', [SyaratKetentuanController::class, 'syaratDestroy'])->name('syarat.destroy');
+=======
+    Route::get('/dashboard/syarat', [SyaratKetentuanControllers::class, 'syaratIndex'])->name('dashboard.syarat');
+    Route::post('/dashboard/syarat/store', [SyaratKetentuanControllers::class, 'syaratStore'])->name('syarat.store');
+    Route::get('/dashboard/syarat/{id}', [SyaratKetentuanControllers::class, 'syaratShow'])->name('syarat.show');
+    Route::put('/dashboard/syarat/{id}', [SyaratKetentuanControllers::class, 'syaratUpdate'])->name('syarat.update');
+    Route::delete('/dashboard/syarat/{id}', [SyaratKetentuanControllers::class, 'syaratDestroy'])->name('syarat.destroy');
+>>>>>>> 5a9dfefd4a1c4645d1b8cba01f9acf03691b6b91
 
     Route::get('/dashboard/kesan-mahasiswa', [MahasiswaController::class, 'indexKesan'])->name('dashboard.kesan');
     Route::post('/dashboard/kesan-mahasiswa/store', [MahasiswaController::class, 'storeKesan'])->name('kesan.store');
@@ -130,6 +153,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/users/template', [UserImportController::class, 'download'])->name('users.template');
     Route::get('/mahasiswa/template', [MahasiswaImportController::class, 'download'])->name('mahasiswa.template');
 
+<<<<<<< HEAD
     // ===============================================
     // 🎯 ROUTES BARU UNTUK MEDIA WISUDA
     // ===============================================
@@ -148,6 +172,8 @@ Route::middleware(['auth'])->group(function () {
     // 🎯 ROUTES BARU UNTUK STATISTIK
     // ===============================================
     Route::put('/dashboard/statistik/update', [DashboardController::class, 'updateStatistik'])->name('dashboard.statistik.update');
+=======
+>>>>>>> 5a9dfefd4a1c4645d1b8cba01f9acf03691b6b91
 
     Route::get('/toga-selesai', function () {
         return view('viewmahasiswa.togaselesai');
@@ -213,7 +239,12 @@ Route::post('/forgot-password/reset', [ForgotPasswordController::class, 'resetPa
 // Route untuk data wisuda
 Route::get('/viewmahasiswa/wisuda1', [WisudaController::class, 'index'])->name('viewmahasiswa.wisuda1');
 Route::put('/viewmahasiswa/wisuda1/{id}', [WisudaController::class, 'update'])->name('viewmahasiswa.wisuda1.update');
+<<<<<<< HEAD
 Route::delete('/wisuda1/{id}', [WisudaController::class, 'destroy'])->name('wisuda1.delete');
+=======
+Route::delete('/wisuda1/{id}', [WisudaController::class, 'destroy'])
+    ->name('wisuda1.delete');
+>>>>>>> 5a9dfefd4a1c4645d1b8cba01f9acf03691b6b91
 
 Route::post('/users/import', [UserImportController::class, 'import'])->name('users.import');
 Route::get('/users/export', [UserImportController::class, 'exportUsers'])->name('users.export');
@@ -222,4 +253,8 @@ Route::get('/users/template', [UserImportController::class, 'download'])->name('
 Route::get('/mahasiswa/template', [MahasiswaImportController::class, 'download'])->name('mahasiswa.template');
 Route::get('/skpi/template', [SkpiImportController::class, 'download'])->name('skpi.template');
 Route::post('/skpi/import', [SkpiImportController::class, 'import'])->name('skpi.import');
+<<<<<<< HEAD
 Route::get('/skpi/export', [SkpiImportController::class, 'exportUsers'])->name('skpi.export');
+=======
+Route::get('/skpi/export', [SkpiImportController::class, 'exportUsers'])->name('skpi.export');
+>>>>>>> 5a9dfefd4a1c4645d1b8cba01f9acf03691b6b91

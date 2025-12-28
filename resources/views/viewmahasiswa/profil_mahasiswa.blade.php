@@ -83,6 +83,7 @@
 
     /* Modal Edit tetap default, tidak diubah */
 </style>
+<<<<<<< HEAD
 @if(session('error'))
 <div class="alert alert-danger alert-dismissible fade show" role="alert">
     {{ session('error') }}
@@ -107,6 +108,8 @@
     <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
 </div>
 @endif
+=======
+>>>>>>> 5a9dfefd4a1c4645d1b8cba01f9acf03691b6b91
 
 <div class="modal fade" id="importMahasiswaModal" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered">
@@ -118,14 +121,24 @@
 
             <div class="modal-body">
                 {{-- ALERT SESSION DI MODAL --}}
+<<<<<<< HEAD
                 <!-- @if(session('error'))
+=======
+                @if(session('error'))
+>>>>>>> 5a9dfefd4a1c4645d1b8cba01f9acf03691b6b91
                 <div class="alert alert-danger alert-dismissible fade show" role="alert">
                     {{ session('error') }}
                     <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                 </div>
+<<<<<<< HEAD
                 @endif -->
 
                 <!-- @if(session('success'))
+=======
+                @endif
+
+                @if(session('success'))
+>>>>>>> 5a9dfefd4a1c4645d1b8cba01f9acf03691b6b91
                 <div class="alert alert-success alert-dismissible fade show" role="alert">
                     {{ session('success') }}
                     <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
@@ -141,7 +154,11 @@
                     </ul>
                     <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                 </div>
+<<<<<<< HEAD
                 @endif -->
+=======
+                @endif
+>>>>>>> 5a9dfefd4a1c4645d1b8cba01f9acf03691b6b91
 
                 {{-- FORM IMPORT --}}
                 <form action="{{ route('mahasiswa.import') }}" method="POST" enctype="multipart/form-data">
@@ -347,6 +364,31 @@
     </div>
 </div>
 
+<<<<<<< HEAD
+=======
+{{-- ================= MODAL IMPORT MAHASISWA (ATAS - TETAP) ================= --}}
+<div class="modal fade" id="importMahasiswaModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Import Mahasiswa</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form action="{{ route('mahasiswa.import') }}" method="POST" enctype="multipart/form-data">
+                    @csrf
+                    <input type="file" name="file" class="form-control mb-3" required>
+                    <button type="submit" class="btn btn-success w-100">
+                        <i class="bi bi-upload"></i> Import Mahasiswa
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+{{-- ================= MODAL USERS ACTION (TETAP) ================= --}}
+>>>>>>> 5a9dfefd4a1c4645d1b8cba01f9acf03691b6b91
 <div class="modal fade" id="usersActionModal" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
@@ -354,6 +396,7 @@
                 <h5 class="modal-title">Kelola Users</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
+<<<<<<< HEAD
 
             <div class="modal-body text-center">
                 <div class="d-flex gap-2 justify-content-center">
@@ -407,10 +450,24 @@
                 </div>
             </div>
 
+=======
+            <div class="modal-body text-center">
+                <button class="btn btn-outline-success"
+                    data-bs-toggle="modal"
+                    data-bs-target="#importUsersModal"
+                    data-bs-dismiss="modal">
+                    <i class="bi bi-upload"></i> Import
+                </button>
+            </div>
+>>>>>>> 5a9dfefd4a1c4645d1b8cba01f9acf03691b6b91
         </div>
     </div>
 </div>
 
+<<<<<<< HEAD
+=======
+{{-- ================= MODAL IMPORT USERS (TETAP) ================= --}}
+>>>>>>> 5a9dfefd4a1c4645d1b8cba01f9acf03691b6b91
 <div class="modal fade" id="importUsersModal" tabindex="-1">
     <div class="modal-dialog">
         <form action="{{ route('users.import') }}" method="POST" enctype="multipart/form-data" id="formImportUsers">
@@ -420,7 +477,10 @@
                     <h5 class="modal-title">Import Users (CSV / Excel)</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
+<<<<<<< HEAD
 
+=======
+>>>>>>> 5a9dfefd4a1c4645d1b8cba01f9acf03691b6b91
                 <div class="modal-body">
                     <input type="file"
                         name="file"
@@ -428,9 +488,13 @@
                         class="form-control"
                         required
                         accept=".csv,.xlsx,.xls">
+<<<<<<< HEAD
                     <small class="text-muted">Format: CSV, XLSX, XLS (Max 2MB)</small>
                 </div>
 
+=======
+                </div>
+>>>>>>> 5a9dfefd4a1c4645d1b8cba01f9acf03691b6b91
                 <div class="modal-footer">
                     <button type="submit" class="btn btn-success">
                         <i class="bi bi-upload"></i> Import
@@ -441,8 +505,13 @@
     </div>
 </div>
 
+<<<<<<< HEAD
 
 <!-- <div class="modal fade" id="importMahasiswaModal" tabindex="-1">
+=======
+{{-- ================= MODAL IMPORT MAHASISWA (BAWAH) ================= --}}
+<div class="modal fade" id="importMahasiswaModal_bottom" tabindex="-1"> {{-- ★ PERBAIKAN ID --}}
+>>>>>>> 5a9dfefd4a1c4645d1b8cba01f9acf03691b6b91
     <div class="modal-dialog">
         <form action="{{ route('mahasiswa.import') }}" method="POST" enctype="multipart/form-data">
             @csrf
@@ -452,7 +521,11 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
+<<<<<<< HEAD
                     <input type="file" name="file" class="form-control" required accept=".xlsx,.csv">
+=======
+                    <input type="file" name="file" class="form-control" required>
+>>>>>>> 5a9dfefd4a1c4645d1b8cba01f9acf03691b6b91
                 </div>
                 <div class="modal-footer">
                     <button type="submit" class="btn btn-success">Import</button>
@@ -460,7 +533,11 @@
             </div>
         </form>
     </div>
+<<<<<<< HEAD
 </div> -->
+=======
+</div>
+>>>>>>> 5a9dfefd4a1c4645d1b8cba01f9acf03691b6b91
 
 @endsection
 
@@ -574,15 +651,28 @@
         const file = fileInput.files[0];
 
         console.log('File selected:', file);
+<<<<<<< HEAD
         console.log('File name:', file?.name);
         console.log('File size:', file?.size);
         console.log('File type:', file?.type);
+=======
+>>>>>>> 5a9dfefd4a1c4645d1b8cba01f9acf03691b6b91
 
         if (!file) {
             e.preventDefault();
             alert('Pilih file terlebih dahulu!');
         }
     });
+<<<<<<< HEAD
+=======
+
+    /* ===== TAMBAHAN AGAR PASTI NEMPEL (TIDAK MENGGANTI LOGIC) ===== */
+    $(document).ready(function() {
+        $('#formImportUsers').on('submit', function() {
+            console.log('FORM IMPORT USER TERPANGGIL (JQUERY)');
+        });
+    });
+>>>>>>> 5a9dfefd4a1c4645d1b8cba01f9acf03691b6b91
 </script>
 
 @if(session('success_swal'))

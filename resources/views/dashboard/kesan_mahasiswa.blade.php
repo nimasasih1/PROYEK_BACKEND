@@ -165,8 +165,12 @@
             </div>
 
             <div class="faq-controls">
+<<<<<<< HEAD
                 {{-- FIX: Pakai URL langsung, lebih aman --}}
                 <form action="{{ url('/dashboard/kesan-mahasiswa/' . $k->id . '/toggle') }}" method="POST" class="d-inline">
+=======
+                <form action="{{ route('kesan.toggle', $k->id) }}" method="POST" class="d-inline">
+>>>>>>> 5a9dfefd4a1c4645d1b8cba01f9acf03691b6b91
                     @csrf
                     @method('PATCH')
                     <button type="button" class="btn status-btn {{ $k->status == 1 ? 'btn-outline-secondary' : 'btn-outline-success' }}"
@@ -187,8 +191,12 @@
                     <i class="bi bi-pencil"></i>
                 </button>
 
+<<<<<<< HEAD
                 {{-- FIX: Pakai URL langsung untuk delete juga --}}
                 <form action="{{ url('/dashboard/kesan-mahasiswa/' . $k->id) }}" method="POST" class="d-inline">
+=======
+                <form action="{{ route('kesan.destroy', $k->id) }}" method="POST" class="d-inline">
+>>>>>>> 5a9dfefd4a1c4645d1b8cba01f9acf03691b6b91
                     @csrf
                     @method('DELETE')
                     <button type="button" class="icon-btn btn-delete"
@@ -347,7 +355,11 @@
             $('#edit_nama').val(btn.data('nama'));
             $('#edit_tanggal').val(btn.data('tanggal'));
             $('#edit_kesan').val(btn.data('kesan'));
+<<<<<<< HEAD
             // Mengatur action form - FIX: pakai URL langsung
+=======
+            // Mengatur action form
+>>>>>>> 5a9dfefd4a1c4645d1b8cba01f9acf03691b6b91
             $('#editKesanForm').attr('action', '/dashboard/kesan-mahasiswa/' + btn.data('id'));
             // Tampilkan modal
             editModal.show();

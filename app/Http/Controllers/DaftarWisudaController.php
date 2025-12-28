@@ -14,6 +14,7 @@ use App\Models\DaftarWisuda;
 class DaftarWisudaController extends Controller
 {
     public function index()
+<<<<<<< HEAD
 {
     $user = auth()->user();
     $mahasiswa = Mahasiswa::where('nim', $user->username)->first();
@@ -43,6 +44,33 @@ class DaftarWisudaController extends Controller
     return view('daftar_wisuda', compact('user', 'mahasiswa', 'data', 'terdaftar', 'tahun', 'latest'));
 }
 
+=======
+    {
+        $user = auth()->user();
+        $mahasiswa = Mahasiswa::where('nim', $user->username)->first();
+
+        $tahun = session('tahun_filter');
+
+        $data = PendaftaranWisuda::with(['mahasiswa', 'toga'])
+            ->when($tahun, function ($query, $tahun) {
+                return $query->whereHas('mahasiswa', function ($q) use ($tahun) {
+                    $q->where('tahun', $tahun);
+                });
+            })
+            ->orderBy('id_pendaftaran', 'desc')
+            ->get();
+
+        $terdaftar = PendaftaranWisuda::pluck('id_mahasiswa')->toArray();
+
+        // ⭐ INI YANG WAJIB DITAMBAHKAN
+        $latest = PendaftaranWisuda::where('id_mahasiswa', $mahasiswa->id_mahasiswa)
+            ->orderBy('id_pendaftaran', 'desc')
+            ->first();
+
+        return view('daftar_wisuda', compact('user', 'mahasiswa', 'data', 'terdaftar', 'tahun', 'latest'));
+    }
+
+>>>>>>> 5a9dfefd4a1c4645d1b8cba01f9acf03691b6b91
 
     public function listWisuda()
     {

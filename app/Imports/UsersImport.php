@@ -49,7 +49,11 @@ class UsersImport implements ToModel, WithHeadingRow, WithValidation
     public function rules(): array
     {
         return [
+<<<<<<< HEAD
             'email'    => 'nullable|email|unique:users,email',
+=======
+            'email'    => 'required|email|unique:users,email',
+>>>>>>> 5a9dfefd4a1c4645d1b8cba01f9acf03691b6b91
             'role'     => 'nullable|in:mahasiswa,baak,perpustakaan,finance,fakultas'
         ];
     }

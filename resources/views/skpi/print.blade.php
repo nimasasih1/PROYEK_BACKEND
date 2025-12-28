@@ -3,7 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<<<<<<< HEAD
     <title>SKPI - Diploma Supplement</title>
+=======
+    <title>SKPI - {{ $skpi->mahasiswa->nama_mahasiswa ?? '' }}</title>
+>>>>>>> 5a9dfefd4a1c4645d1b8cba01f9acf03691b6b91
     <style>
         * {
             margin: 0;
@@ -68,6 +72,7 @@
             font-size: 11pt;
             font-weight: bold;
             margin-top: 25px;
+<<<<<<< HEAD
             margin-bottom: 8px;
             text-transform: uppercase;
         }
@@ -92,6 +97,59 @@
         .info-value {
             width: 60%;
             font-weight: normal;
+=======
+            margin-bottom: 12px;
+            text-transform: uppercase;
+        }
+        
+        /* STYLE UNTUK TABEL KOTAK */
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+            border: 2px solid #000;
+        }
+        
+        .data-table tr {
+            border-bottom: 1px solid #000;
+        }
+        
+        .data-table tr:last-child {
+            border-bottom: none;
+        }
+        
+        .data-table td {
+            padding: 8px 12px;
+            vertical-align: top;
+            border-right: 1px solid #000;
+        }
+        
+        .data-table td:last-child {
+            border-right: none;
+        }
+        
+        .data-table .label-cell {
+            width: 40%;
+            font-size: 10pt;
+            line-height: 1.4;
+        }
+        
+        .data-table .label-id {
+            display: block;
+            margin-bottom: 2px;
+        }
+        
+        .data-table .label-en {
+            display: block;
+            font-style: italic;
+            font-size: 9pt;
+        }
+        
+        .data-table .value-cell {
+            width: 60%;
+            font-weight: bold;
+            font-size: 11pt;
+>>>>>>> 5a9dfefd4a1c4645d1b8cba01f9acf03691b6b91
         }
         
         .competency-section {
@@ -121,7 +179,11 @@
         
         .two-column {
             display: flex;
+<<<<<<< HEAD
             gap: 30px;
+=======
+            gap: 40px;
+>>>>>>> 5a9dfefd4a1c4645d1b8cba01f9acf03691b6b91
             margin-top: 20px;
         }
         
@@ -165,9 +227,25 @@
         }
         
         .print-button:hover {
+<<<<<<< HEAD
             background: #1976D2;
         }
         
+=======
+            background: #c41e2e;
+        }
+        
+        .content-box {
+    min-height: 50px;  /* ← LEBIH KECIL LAGI */
+    padding: 6px;      
+    border: 1px solid #ddd;
+    background: #f9f9f9;
+    text-align: justify;
+    font-size: 8.5pt;  
+    line-height: 1.4;
+}
+        
+>>>>>>> 5a9dfefd4a1c4645d1b8cba01f9acf03691b6b91
         @media print {
             body {
                 background: white;
@@ -196,7 +274,11 @@
     <div class="container">
         <!-- HALAMAN 1 -->
         <div class="header">
+<<<<<<< HEAD
             Name of applicant/ ID
+=======
+            {{ $skpi->mahasiswa->nama_mahasiswa ?? '' }} / {{ $skpi->mahasiswa->nim ?? '' }}
+>>>>>>> 5a9dfefd4a1c4645d1b8cba01f9acf03691b6b91
         </div>
         
         <div class="title-section">
@@ -212,12 +294,17 @@
             This Diploma Supplement was developed based on Indonesian National Qualification Framework (KKNI) and UNESCO Convention. The purpose of the supplement is to provide sufficient independent data describing the nature, level, context, content and status of the studies that were pursued and successfully completed by the individual named on the original qualification to which this supplement is appended.
         </div>
         
+<<<<<<< HEAD
         <!-- SECTION 01 -->
+=======
+        <!-- SECTION 01 - DENGAN TABEL KOTAK -->
+>>>>>>> 5a9dfefd4a1c4645d1b8cba01f9acf03691b6b91
         <div class="section-number">
             01. INFORMASI TENTANG IDENTITAS DIRI PEMEGANG SKPI<br>
             01. INFORMATION IDENTIFYING THE HOLDER OF THE DIPLOMA SUPPLEMENT
         </div>
         
+<<<<<<< HEAD
         <div class="info-table">
             <div class="info-row">
                 <div class="info-label">NAMA LENGKAP<br><i>Full Name</i></div>
@@ -246,11 +333,63 @@
         </div>
         
         <!-- SECTION 02 -->
+=======
+        <table class="data-table">
+            <tr>
+                <td class="label-cell">
+                    <span class="label-id">NAMA LENGKAP</span>
+                    <span class="label-en">Full Name</span>
+                </td>
+                <td class="value-cell">{{ $skpi->mahasiswa->nama_mahasiswa ?? '-' }}</td>
+            </tr>
+            <tr>
+                <td class="label-cell">
+                    <span class="label-id">TAHUN LULUS</span>
+                    <span class="label-en">Year of completion</span>
+                </td>
+                <td class="value-cell">{{ $skpi->tahun_lulus ?? '-' }}</td>
+            </tr>
+            <tr>
+                <td class="label-cell">
+                    <span class="label-id">TEMPAT TANGGAL LAHIR</span>
+                    <span class="label-en">Date and Place Birth</span>
+                </td>
+                <td class="value-cell">
+                    {{ $skpi->tempat_lahir ?? '-' }}, 
+                    {{ $skpi->mahasiswa->tanggal_lahir ? \Carbon\Carbon::parse($skpi->mahasiswa->tanggal_lahir)->format('d F Y') : '-' }}
+                </td>
+            </tr>
+            <tr>
+                <td class="label-cell">
+                    <span class="label-id">NOMOR IJAZAH</span>
+                    <span class="label-en">Diploma Number</span>
+                </td>
+                <td class="value-cell">{{ $skpi->no_ijazah ?? '-' }}</td>
+            </tr>
+            <tr>
+                <td class="label-cell">
+                    <span class="label-id">NOMOR INDUK MAHASISWA</span>
+                    <span class="label-en">Student Identification Number</span>
+                </td>
+                <td class="value-cell">{{ $skpi->mahasiswa->nim ?? '-' }}</td>
+            </tr>
+            <tr>
+                <td class="label-cell">
+                    <span class="label-id">GELAR</span>
+                    <span class="label-en">Name of Qualification</span>
+                </td>
+                <td class="value-cell">{{ $skpi->gelar ?? '-' }}</td>
+            </tr>
+        </table>
+        
+        <!-- SECTION 02 - DENGAN TABEL KOTAK -->
+>>>>>>> 5a9dfefd4a1c4645d1b8cba01f9acf03691b6b91
         <div class="section-number">
             02. INFORMASI TENTANG IDENTITAS PENYELENGGARA PROGRAM<br>
             02. INFORMATION IDENTIFYING THE INSTITUTION ADMINISTERING STUDIES
         </div>
         
+<<<<<<< HEAD
         <div class="info-table">
             <div class="info-row">
                 <div class="info-label">SK PENDIRIAN PERGURUAN TINGGI<br><i>Higher Education Institution's License</i></div>
@@ -301,12 +440,104 @@
                 <div class="info-value">_______________________________</div>
             </div>
         </div>
+=======
+        <table class="data-table">
+            <tr>
+                <td class="label-cell">
+                    <span class="label-id">SK PENDIRIAN PERGURUAN TINGGI</span>
+                    <span class="label-en">Higher Education Institution's License</span>
+                </td>
+                <td class="value-cell">{{ $skpi->sk_pendirian_perti ?? '-' }}</td>
+            </tr>
+            <tr>
+                <td class="label-cell">
+                    <span class="label-id">PERSYARATAN PENERIMAAN</span>
+                    <span class="label-en">Entry Requirements</span>
+                </td>
+                <td class="value-cell">{{ $skpi->persyaratan_penerimaan ?? '-' }}</td>
+            </tr>
+            <tr>
+                <td class="label-cell">
+                    <span class="label-id">NAMA PERGURUAN TINGGI</span>
+                    <span class="label-en">Name of Institution Administering Studies</span>
+                </td>
+                <td class="value-cell">{{ $skpi->nama_perti ?? 'Universitas Horizon Indonesia' }}</td>
+            </tr>
+            <tr>
+                <td class="label-cell">
+                    <span class="label-id">BAHASA PENGANTAR KULIAH</span>
+                    <span class="label-en">Language of Instruction</span>
+                </td>
+                <td class="value-cell">{{ $skpi->bahasa_pengantar_kuliah ?? '-' }}</td>
+            </tr>
+            <tr>
+                <td class="label-cell">
+                    <span class="label-id">PROGRAM STUDI</span>
+                    <span class="label-en">Study Program</span>
+                </td>
+                <td class="value-cell">{{ $skpi->mahasiswa->prodi ?? '-' }}</td>
+            </tr>
+            <tr>
+                <td class="label-cell">
+                    <span class="label-id">SISTEM PENILAIAN</span>
+                    <span class="label-en">Grading System</span>
+                </td>
+                <td class="value-cell">{{ $skpi->sistem_penilaian ?? '-' }}</td>
+            </tr>
+            <tr>
+                <td class="label-cell">
+                    <span class="label-id">KELAS</span>
+                    <span class="label-en">Mode of Study</span>
+                </td>
+                <td class="value-cell">{{ $skpi->kelas ?? '-' }}</td>
+            </tr>
+            <tr>
+                <td class="label-cell">
+                    <span class="label-id">LAMA STUDI REGULER</span>
+                    <span class="label-en">Length of Study</span>
+                </td>
+                <td class="value-cell">{{ $skpi->lama_studi_rg ?? '-' }}</td>
+            </tr>
+            <tr>
+                <td class="label-cell">
+                    <span class="label-id">JENIS & JENJANG PENDIDIKAN</span>
+                    <span class="label-en">Type & Level of Education</span>
+                </td>
+                <td class="value-cell">{{ $skpi->mahasiswa->jenjang ?? '-' }}</td>
+            </tr>
+            <tr>
+                <td class="label-cell">
+                    <span class="label-id">JENJANG PENDIDIKAN LANJUTAN</span>
+                    <span class="label-en">Access to Further Study</span>
+                </td>
+                <td class="value-cell">{{ $skpi->jenjang_pd_lanjutan ?? '-' }}</td>
+            </tr>
+            <tr>
+                <td class="label-cell">
+                    <span class="label-id">JENJANG KUALIFIKASI SESUAI KKNI</span>
+                    <span class="label-en">Level of Qualification in KKNI</span>
+                </td>
+                <td class="value-cell">{{ $skpi->jenjang_kualif_kkn1 ?? '-' }}</td>
+            </tr>
+            <tr>
+                <td class="label-cell">
+                    <span class="label-id">STATUS PROFESI (BILA ADA)</span>
+                    <span class="label-en">Professional Status (If Applicable)</span>
+                </td>
+                <td class="value-cell">{{ $skpi->status_profesi ?? '-' }}</td>
+            </tr>
+        </table>
+>>>>>>> 5a9dfefd4a1c4645d1b8cba01f9acf03691b6b91
         
         <div class="page-break"></div>
         
         <!-- HALAMAN 2 -->
         <div class="header">
+<<<<<<< HEAD
             Name of applicant/ ID
+=======
+            {{ $skpi->mahasiswa->nama_mahasiswa ?? '' }} / {{ $skpi->mahasiswa->nim ?? '' }}
+>>>>>>> 5a9dfefd4a1c4645d1b8cba01f9acf03691b6b91
         </div>
         
         <!-- SECTION 03 -->
@@ -318,6 +549,7 @@
         <div class="two-column">
             <div class="column">
                 <div class="competency-title">KEMAMPUAN KERJA</div>
+<<<<<<< HEAD
                 <div class="competency-list">
                     <div class="competency-item">
                         <span class="competency-item-title">1. Pemrograman dan Pengembangan Perangkat Lunak:</span><br>
@@ -371,10 +603,16 @@
                 </div>
                 
                 <div class="competency-title" style="margin-top: 25px;">PENGUASAAN PENGETAHUAN</div>
+=======
+                <div class="content-box">
+                    {!! nl2br(e($skpi->kemampuan_kerja ?? 'Tidak ada data')) !!}
+                </div>
+>>>>>>> 5a9dfefd4a1c4645d1b8cba01f9acf03691b6b91
             </div>
             
             <div class="column">
                 <div class="competency-title">SKILLS</div>
+<<<<<<< HEAD
                 <div class="competency-list">
                     <div class="competency-item">
                         <span class="competency-item-title">Informatics Study Program Work Competencies</span>
@@ -422,6 +660,27 @@
                 </div>
                 
                 <div class="competency-title" style="margin-top: 25px;">KNOWLEDGE</div>
+=======
+                <div class="content-box">
+                    {!! nl2br(e($skpi->kemampuan_kerja ?? 'No data available')) !!}
+                </div>
+            </div>
+        </div>
+        
+        <div class="two-column" style="margin-top: 25px;">
+            <div class="column">
+                <div class="competency-title">PENGUASAAN PENGETAHUAN</div>
+                <div class="content-box">
+                    {!! nl2br(e($skpi->penguasaan_pengetahuan ?? 'Tidak ada data')) !!}
+                </div>
+            </div>
+            
+            <div class="column">
+                <div class="competency-title">KNOWLEDGE</div>
+                <div class="content-box">
+                    {!! nl2br(e($skpi->penguasaan_pengetahuan ?? 'No data available')) !!}
+                </div>
+>>>>>>> 5a9dfefd4a1c4645d1b8cba01f9acf03691b6b91
             </div>
         </div>
         
@@ -429,30 +688,58 @@
         
         <!-- HALAMAN 3 -->
         <div class="header">
+<<<<<<< HEAD
             Name of applicant/ ID
+=======
+            {{ $skpi->mahasiswa->nama_mahasiswa ?? '' }} / {{ $skpi->mahasiswa->nim ?? '' }}
+>>>>>>> 5a9dfefd4a1c4645d1b8cba01f9acf03691b6b91
         </div>
         
         <div class="two-column" style="margin-top: 40px;">
             <div class="column">
                 <div class="competency-title">AKTIVITAS, PRESTASI DAN PENGHARGAAN</div>
+<<<<<<< HEAD
                 <div style="min-height: 200px; border-bottom: 1px solid #ccc;"></div>
+=======
+                <div class="content-box">
+                    {!! nl2br(e($skpi->aktiv_pres_penghargaan ?? 'Tidak ada data')) !!}
+                </div>
+>>>>>>> 5a9dfefd4a1c4645d1b8cba01f9acf03691b6b91
             </div>
             
             <div class="column">
                 <div class="competency-title">ACTIVITIES, ACHIEVEMENT AND AWARDS</div>
+<<<<<<< HEAD
                 <div style="min-height: 200px; border-bottom: 1px solid #ccc;"></div>
+=======
+                <div class="content-box">
+                    {!! nl2br(e($skpi->aktiv_pres_penghargaan ?? 'No data available')) !!}
+                </div>
+>>>>>>> 5a9dfefd4a1c4645d1b8cba01f9acf03691b6b91
             </div>
         </div>
         
         <div class="two-column" style="margin-top: 40px;">
             <div class="column">
                 <div class="competency-title">MAGANG</div>
+<<<<<<< HEAD
                 <div style="min-height: 200px; border-bottom: 1px solid #ccc;"></div>
+=======
+                <div class="content-box">
+                    {!! nl2br(e($skpi->magang ?? 'Tidak ada data')) !!}
+                </div>
+>>>>>>> 5a9dfefd4a1c4645d1b8cba01f9acf03691b6b91
             </div>
             
             <div class="column">
                 <div class="competency-title">INTERNSHIP</div>
+<<<<<<< HEAD
                 <div style="min-height: 200px; border-bottom: 1px solid #ccc;"></div>
+=======
+                <div class="content-box">
+                    {!! nl2br(e($skpi->magang ?? 'No data available')) !!}
+                </div>
+>>>>>>> 5a9dfefd4a1c4645d1b8cba01f9acf03691b6b91
             </div>
         </div>
         
@@ -460,7 +747,11 @@
         
         <!-- HALAMAN 4 -->
         <div class="header">
+<<<<<<< HEAD
             Name of applicant/ ID
+=======
+            {{ $skpi->mahasiswa->nama_mahasiswa ?? '' }} / {{ $skpi->mahasiswa->nim ?? '' }}
+>>>>>>> 5a9dfefd4a1c4645d1b8cba01f9acf03691b6b91
         </div>
         
         <!-- SECTION 04 -->
@@ -472,24 +763,49 @@
         <div class="two-column" style="margin-top: 20px;">
             <div class="column">
                 <div class="competency-title">Jenjang Pendidikan dan Syarat Belajar</div>
+<<<<<<< HEAD
                 <div style="min-height: 150px; border-bottom: 1px solid #ccc;"></div>
             </div>
             
             <div class="column">
                 <div class="competency-title">SKS dan Lama Studi</div>
                 <div style="min-height: 150px; border-bottom: 1px solid #ccc;"></div>
+=======
+                <div class="content-box">
+                    {!! nl2br(e($skpi->jenjangpend_syaratbelajar ?? 'Tidak ada data')) !!}
+                </div>
+            </div>
+            
+            <div class="column" style="margin-top: 23px;">
+                <div class="competency-title">SKS dan Lama Studi</div>
+                <div class="content-box">
+                    {!! nl2br(e($skpi->sks_lamastudi ?? 'Tidak ada data')) !!}
+                </div>
+>>>>>>> 5a9dfefd4a1c4645d1b8cba01f9acf03691b6b91
             </div>
         </div>
         
         <div class="two-column" style="margin-top: 20px;">
             <div class="column">
                 <div class="competency-title">Levels of Education and Conditions of Learning</div>
+<<<<<<< HEAD
                 <div style="min-height: 150px; border-bottom: 1px solid #ccc;"></div>
+=======
+                <div class="content-box">
+                    {!! nl2br(e($skpi->jenjangpend_syaratbelajar ?? 'No data available')) !!}
+                </div>
+>>>>>>> 5a9dfefd4a1c4645d1b8cba01f9acf03691b6b91
             </div>
             
             <div class="column">
                 <div class="competency-title">Semester Credit Unit and Duration of Study</div>
+<<<<<<< HEAD
                 <div style="min-height: 150px; border-bottom: 1px solid #ccc;"></div>
+=======
+                <div class="content-box">
+                    {!! nl2br(e($skpi->sks_lamastudi ?? 'No data available')) !!}
+                </div>
+>>>>>>> 5a9dfefd4a1c4645d1b8cba01f9acf03691b6b91
             </div>
         </div>
         
@@ -499,6 +815,7 @@
             05. INFORMATION ON INDONESIAN QUALIFICATION FRAMEWORK (KKNI)
         </div>
         
+<<<<<<< HEAD
         <div style="min-height: 150px; border-bottom: 1px solid #ccc; margin: 20px 0;"></div>
         
         <!-- SECTION 06 -->
@@ -515,6 +832,30 @@
             <div style="margin-bottom: 80px; border-bottom: 1px solid #000; width: 200px; margin-left: auto; margin-right: auto;"></div>
             <div class="signature-title">Dekan Fakultas</div>
         </div>
+=======
+        <div class="content-box" style="margin: 20px 0;">
+            {!! nl2br(e($skpi->info_kkni ?? 'Tidak ada data')) !!}
+        </div>
+        
+        <!-- SECTION 06 -->
+<div class="section-number" style="margin-top: 40px;">
+    06. PENGESAHAN SKPI<br>
+    06. CERTIFICATION OF THE SUPPLEMENT
+</div>
+
+<div class="signature-location" style="text-align: left;">
+    {{ $skpi->kota ?? 'Cikarang' }}, 
+    {{ $skpi->tanggal_skpi ? \Carbon\Carbon::parse($skpi->tanggal_skpi)->format('d F Y') : \Carbon\Carbon::now()->format('d F Y') }}
+</div>
+
+<div class="signature-section" style="text-align: left;">
+    <div style="margin-bottom: 80px;"></div>
+    <div style="border-bottom: 2px solid #000; width: 250px;"></div>
+    <div class="signature-title" style="margin-top: 10px;">
+        {{ $skpi->nama_dekan ?? 'Dekan Fakultas' }}
+    </div>
+</div>
+>>>>>>> 5a9dfefd4a1c4645d1b8cba01f9acf03691b6b91
     </div>
 </body>
 </html>

@@ -25,6 +25,7 @@ if (Auth::check()) {
             ->latest()
             ->first();
 
+<<<<<<< HEAD
         if ($pendaftaran) {
             $terdaftar = true;
         }
@@ -41,6 +42,29 @@ if (Auth::check()) {
             $hasCatatan = true;
         }
     }
+=======
+if ($mahasiswa) {
+$pendaftaran = PendaftaranWisuda::where('id_mahasiswa', $mahasiswa->id_mahasiswa)
+->latest()
+->first();
+
+if ($pendaftaran) {
+$terdaftar = true;
+}
+
+if (
+$pendaftaran &&
+(
+$pendaftaran->catatan_fakultas ||
+$pendaftaran->catatan_perpus ||
+$pendaftaran->catatan_baak ||
+$pendaftaran->catatan_finance
+)
+) {
+$hasCatatan = true;
+}
+}
+>>>>>>> 5a9dfefd4a1c4645d1b8cba01f9acf03691b6b91
 }
 @endphp
 

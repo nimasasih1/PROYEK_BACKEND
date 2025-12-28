@@ -140,6 +140,183 @@
       background-color: rgba(152, 5, 23, 0.08) !important;
       color: #980517 !important;
       padding-left: 2rem !important;
+<<<<<<< HEAD
+    }
+
+    .dropdown-item i {
+      margin-right: 8px !important;
+      width: 18px !important;
+    }
+
+    /* NOTIFICATION BADGE */
+    .position-relative .position-absolute {
+      width: 10px !important;
+      height: 10px !important;
+      border: 2px solid white !important;
+    }
+
+    /* PROFILE ICON */
+    .bi-person-circle {
+      font-size: 1.8rem !important;
+      color: #980517 !important;
+      transition: all 0.3s ease !important;
+    }
+
+    .bi-person-circle:hover {
+      transform: scale(1.1) !important;
+    }
+
+    /* NAVBAR TOGGLER */
+    .navbar-toggler {
+      border: 2px solid #980517 !important;
+      padding: 0.5rem 0.75rem !important;
+      transition: all 0.3s ease !important;
+    }
+
+    .navbar-toggler:hover {
+      background-color: rgba(152, 5, 23, 0.1) !important;
+    }
+
+    .navbar-toggler:focus {
+      box-shadow: 0 0 0 0.25rem rgba(152, 5, 23, 0.25) !important;
+    }
+
+    /* MODAL STYLING */
+    .modal-header {
+      background: linear-gradient(135deg, #980517 0%, #c41e3a 100%) !important;
+      color: white !important;
+      border-bottom: none !important;
+    }
+
+    .modal-header .btn-close {
+      filter: brightness(0) invert(1) !important;
+    }
+
+    .modal-title {
+      font-weight: 600 !important;
+      font-family: 'Raleway', sans-serif !important;
+    }
+
+    .modal-body {
+      padding: 2rem !important;
+      font-family: 'Raleway', sans-serif !important;
+    }
+
+    .modal-footer {
+      border-top: 1px solid rgba(0, 0, 0, 0.1) !important;
+    }
+
+    .btn-danger {
+      background: linear-gradient(135deg, #980517 0%, #c41e3a 100%) !important;
+      border: none !important;
+      font-weight: 600 !important;
+      padding: 0.5rem 1.5rem !important;
+      transition: all 0.3s ease !important;
+    }
+
+    .btn-danger:hover {
+      transform: translateY(-2px) !important;
+      box-shadow: 0 5px 15px rgba(152, 5, 23, 0.3) !important;
+    }
+
+    .btn-secondary {
+      font-weight: 600 !important;
+      padding: 0.5rem 1.5rem !important;
+    }
+
+    /* ========================================
+       RESPONSIVE STYLES
+       ======================================== */
+
+    /* Tablet & Mobile */
+    @media (max-width: 991px) {
+      .logo-wrapper {
+        display: none !important;
+      }
+
+      .logo-navbar {
+        height: 35px !important;
+      }
+
+      .navbar-collapse {
+        background: white !important;
+        padding: 1rem !important;
+        margin-top: 1rem !important;
+        border-radius: 10px !important;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1) !important;
+      }
+
+      .nav-link {
+        padding: 0.75rem 1rem !important;
+      }
+
+      .nav-link::after {
+        display: none !important;
+      }
+
+      .navbar-nav {
+        text-align: left !important;
+      }
+
+      .dropdown-menu {
+        border: none !important;
+        box-shadow: none !important;
+        background: #f8f9fa !important;
+        margin-left: 1rem !important;
+      }
+    }
+
+    /* Small Mobile */
+    @media (max-width: 576px) {
+      .navbar-top {
+        padding: 0.5rem 0 !important;
+      }
+
+      .logo-navbar {
+        height: 32px !important;
+      }
+
+      .bi-person-circle {
+        font-size: 1.5rem !important;
+      }
+
+      .modal-body {
+        padding: 1.5rem !important;
+      }
+    }
+
+    /* Extra Small */
+    @media (max-width: 375px) {
+      .logo-navbar {
+        height: 28px !important;
+      }
+
+      .navbar-collapse {
+        padding: 0.75rem !important;
+      }
+
+      .nav-link {
+        font-size: 0.9rem !important;
+        padding: 0.5rem 0.75rem !important;
+      }
+    }
+
+    /* Smooth scroll behavior */
+    html {
+      scroll-behavior: smooth !important;
+    }
+
+    /* Selection color */
+    ::selection {
+      background: #980517 !important;
+      color: white !important;
+    }
+
+    /* Smooth transitions */
+    * {
+      transition: margin 0.3s ease, padding 0.3s ease !important;
+=======
+>>>>>>> 5a9dfefd4a1c4645d1b8cba01f9acf03691b6b91
     }
 
     .dropdown-item i {
@@ -315,6 +492,11 @@
     * {
       transition: margin 0.3s ease, padding 0.3s ease !important;
     }
+
+    .dropdown-toggle::after {
+  display: none !important;
+}
+
   </style>
 </head>
 

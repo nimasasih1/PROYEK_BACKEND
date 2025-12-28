@@ -387,6 +387,7 @@ $hasCatatan = true;
                             <div id="formKesan" class="collapse">
                                 <div class="card-body">
 
+<<<<<<< HEAD
                                     <form action="{{ route('kesan.store') }}" method="POST" class="d-inline">
     @csrf
     <div class="mb-3">
@@ -410,6 +411,33 @@ $hasCatatan = true;
         <button type="submit" class="btn text-white" style="background:#980517;">Simpan</button>
     </div>
 </form>
+=======
+                                    <form action="{{ route('kesan.store') }}" method="POST">
+                                        @csrf
+
+                                        <div class="mb-3">
+                                            <label class="form-label fw-bold">Nama</label>
+                                            <input type="text" class="form-control"
+                                                value="{{ $mahasiswa?->nama_mahasiswa ?? 'Nama Tidak Ditemukan' }}" readonly>
+
+                                            <input type="hidden" name="nama" value="{{ $mahasiswa?->nama_mahasiswa ?? 'Anonim' }}">
+                                        </div>
+
+                                        <div class="mb-3">
+                                            <label class="form-label fw-bold">Tanggal</label>
+                                            <input type="date" name="tanggal" class="form-control" required>
+                                        </div>
+
+                                        <div class="mb-3">
+                                            <label class="form-label fw-bold">Kesan</label>
+                                            <textarea name="kesan" class="form-control" rows="3" required></textarea>
+                                        </div>
+
+                                        <div class="text-end">
+                                            <button type="submit" class="btn text-white" style="background:#980517;">Simpan</button>
+                                        </div>
+                                    </form>
+>>>>>>> 5a9dfefd4a1c4645d1b8cba01f9acf03691b6b91
 
                                 </div>
                             </div>

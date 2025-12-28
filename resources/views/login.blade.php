@@ -163,6 +163,7 @@
   <div class="mb-3">
     <button type="submit" class="btn btn-primary d-grid w-100">Login</button>
   </div>
+<<<<<<< HEAD
 
   <!-- Fallback untuk error lainnya -->
   @if($errors->any() && !$errors->has('username') && !$errors->has('password') && !$errors->has('captcha'))
@@ -175,6 +176,21 @@
 </form>
           
     <p class="text-center mt-4">
+=======
+
+  <!-- Fallback untuk error lainnya -->
+  @if($errors->any() && !$errors->has('username') && !$errors->has('password') && !$errors->has('captcha'))
+    <div class="alert alert-danger mt-2">
+      @foreach($errors->all() as $error)
+        <p class="mb-0">{{ $error }}</p>
+      @endforeach
+    </div>
+  @endif
+</form>
+
+
+          <p class="text-center mt-4">
+>>>>>>> 5a9dfefd4a1c4645d1b8cba01f9acf03691b6b91
             <span>Belum Terdaftar?</span>
             <a href="{{ route('register.form') }}"><span>Register</span></a>
           </p>
