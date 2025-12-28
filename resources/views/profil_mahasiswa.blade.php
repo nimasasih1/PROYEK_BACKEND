@@ -4,15 +4,22 @@ use App\Models\PendaftaranWisuda;
 use Illuminate\Support\Facades\Auth;
 
 $hasCatatan = false;
+$mahasiswa = null;
+$user = null;
+$pendaftaran = null;
 
 if (Auth::check()) {
 $user = Auth::user();
+// Gunakan find() jika 'username' sesuai dengan primary key, atau where().
 $mahasiswa = Mahasiswa::where('nim', $user->username)->first();
 
 if ($mahasiswa) {
 $pendaftaran = PendaftaranWisuda::whereHas('mahasiswa', function ($q) use ($mahasiswa) {
 $q->where('nim', $mahasiswa->nim);
 })->latest()->first();
+// Atau lebih cepat jika relasi sudah didefinisikan:
+// $pendaftaran = $mahasiswa->pendaftaranWisuda()->latest()->first();
+
 
 if ($pendaftaran &&
 ($pendaftaran->catatan_fakultas ||
@@ -27,7 +34,6 @@ $hasCatatan = true;
 
 @include('base.header')
 
-<!-- Font Awesome 6 -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
 
@@ -45,8 +51,8 @@ $hasCatatan = true;
     }
 
     /* ========================================
-           NAVBAR STYLES
-           ======================================== */
+            NAVBAR STYLES
+            ======================================== */
 
     .navbar-top {
         box-shadow: 0 2px 6px 0 rgba(67, 89, 113, 0.12);
@@ -317,98 +323,181 @@ $hasCatatan = true;
 
 <body>
 
-    <!-- PROFIL MAHASISWA -->
-    <div class="profile-container flex-column align-items-center">
-        <!-- Profil Card -->
-        <div class="profile-card mb-4" style="
-    background: rgba(255,255,255,0.95);
-    backdrop-filter: blur(10px);
-    border-radius: 25px;
-    box-shadow: 0 15px 30px rgba(0,0,0,0.15);
-    border: 2px solid #ffe6e6;
-    position: relative;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-    max-width: 400px;
-    width: 100%;
-    padding-top: 15px;
-">
-            <!-- Edit di kanan atas -->
-            <div style="position:absolute; top:15px; right:15px;">
-                <a href="{{ route('edit_profil.edit') }}" title="Edit Profil" style="font-size:20px; color:#980517;">
-                    <i class="fas fa-pen"></i>
-                </a>
+    <div class="container my-5">
+        <div class="card"
+            style="border-radius:25px; padding:35px; box-shadow:0 15px 35px rgba(0,0,0,0.15); background:white;">
+
+            <div class="row g-4 align-items-start">
+
+                <div class="col-md-5">
+                    <div class="profile-card"
+                        style="background:rgba(255,255,255,0.9); border-radius:25px; padding:25px;
+                    box-shadow:0 10px 25px rgba(0,0,0,0.12); position:relative;">
+
+                        <a href="{{ route('edit_profil.edit') }}" title="Edit Profil"
+                            style="position:absolute; top:15px; right:15px; font-size:22px; color:#980517;">
+                            <i class="fas fa-pen"></i>
+                        </a>
+
+                        <div class="text-center">
+
+                            <div class="text-center mb-4">
+                                @php
+                                // Tentukan URL foto saat ini
+                                $fotoUrl = isset($mahasiswa->foto_profil) && $mahasiswa->foto_profil
+                                ? asset($mahasiswa->foto_profil) // langsung dari public
+                                : 'https://via.placeholder.com/150?text=No+Photo';
+                                @endphp
+                                <img src="{{ $fotoUrl }}"
+                                    alt="Foto Profil"
+                                    class="img-thumbnail rounded-circle"
+                                    style="width: 150px; height: 150px; object-fit: cover;">
+                            </div>
+
+                            <h3 class="fw-bold" style="color:#980517;">
+                                {{ $mahasiswa?->nama_mahasiswa ?? '-' }}
+                            </h3>
+
+                            <p style="color:#333; font-weight:500;">
+                                @if(isset($user) && $user->username)
+                                {{ $user->username }}
+                                @else
+                                -
+                                @endif
+                            </p>
+                        </div>
+
+                        <hr>
+
+                        <div style="font-size:0.95rem;">
+                            <p><strong style="color:#980517;">Fakultas:</strong> {{ $mahasiswa?->fakultas ?? '-' }}</p>
+                            <p><strong style="color:#980517;">Program Studi:</strong> {{ $mahasiswa?->prodi ?? '-' }}</p>
+                            <p><strong style="color:#980517;">Angkatan:</strong> {{ $mahasiswa?->tahun ?? '-' }}</p>
+                        </div>
+
+
+                        <div class="card" style="border-radius: 12px; margin-top: 10px;">
+                            <div class="card-header d-flex justify-content-between align-items-center"
+                                style="background:#980517; color:white; cursor:pointer;"
+                                data-bs-toggle="collapse" data-bs-target="#formKesan">
+                                <h6 class="mb-0">Tambah Kesan</h6>
+                                <i class="bi bi-chevron-down"></i>
+                            </div>
+
+                            <div id="formKesan" class="collapse">
+                                <div class="card-body">
+
+                                    <form action="{{ route('kesan.store') }}" method="POST" class="d-inline">
+    @csrf
+    <div class="mb-3">
+        <label class="form-label fw-bold">Nama</label>
+        <input type="text" class="form-control"
+            value="{{ $mahasiswa?->nama_mahasiswa ?? 'Nama Tidak Ditemukan' }}" readonly>
+        <input type="hidden" name="nama" value="{{ $mahasiswa?->nama_mahasiswa ?? 'Anonim' }}">
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label fw-bold">Tanggal</label>
+        <input type="date" name="tanggal" class="form-control" required>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label fw-bold">Kesan</label>
+        <textarea name="kesan" class="form-control" rows="3" required></textarea>
+    </div>
+
+    <div class="text-end">
+        <button type="submit" class="btn text-white" style="background:#980517;">Simpan</button>
+    </div>
+</form>
+
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <div class="col-md-7">
+                    <div class="card"
+                        style="border-radius:20px; overflow:hidden; box-shadow:0 8px 20px rgba(0,0,0,0.15);">
+
+                        <div class="card-header text-white text-center"
+                            style="background:#980517; font-weight:600; font-size:1.1rem;">
+                            Catatan Fakultas & Unit Terkait
+                        </div>
+
+                        <div class="card-body" style="padding:0;">
+
+                            <div class="accordion" id="catatanAccordion">
+
+                                <div class="accordion-item">
+                                    <h2 class="accordion-header">
+                                        <button class="accordion-button collapsed" type="button"
+                                            data-bs-toggle="collapse" data-bs-target="#fakultas">
+                                            Catatan Fakultas
+                                        </button>
+                                    </h2>
+                                    <div id="fakultas" class="accordion-collapse collapse">
+                                        <div class="accordion-body">
+                                            {{ $pendaftaran?->catatan_fakultas ?? 'Tidak ada catatan.' }}
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="accordion-item">
+                                    <h2 class="accordion-header">
+                                        <button class="accordion-button collapsed" type="button"
+                                            data-bs-toggle="collapse" data-bs-target="#perpus">
+                                            Catatan Perpustakaan
+                                        </button>
+                                    </h2>
+                                    <div id="perpus" class="accordion-collapse collapse">
+                                        <div class="accordion-body">
+                                            {{ $pendaftaran?->catatan_perpus ?? 'Tidak ada catatan.' }}
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="accordion-item">
+                                    <h2 class="accordion-header">
+                                        <button class="accordion-button collapsed" type="button"
+                                            data-bs-toggle="collapse" data-bs-target="#baak">
+                                            Catatan BAAK
+                                        </button>
+                                    </h2>
+                                    <div id="baak" class="accordion-collapse collapse">
+                                        <div class="accordion-body">
+                                            {{ $pendaftaran?->catatan_baak ?? 'Tidak ada catatan.' }}
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="accordion-item">
+                                    <h2 class="accordion-header">
+                                        <button class="accordion-button collapsed" type="button"
+                                            data-bs-toggle="collapse" data-bs-target="#finance">
+                                            Catatan Keuangan
+                                        </button>
+                                    </h2>
+                                    <div id="finance" class="accordion-collapse collapse">
+                                        <div class="accordion-body">
+                                            {{ $pendaftaran?->catatan_finance ?? 'Tidak ada catatan.' }}
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+
             </div>
 
-            <!-- Avatar -->
-            <div style="position: relative; margin: 60px auto 15px auto; text-align:center;">
-                <img src="{{ $mahasiswa && $mahasiswa->avatar ? asset($mahasiswa->avatar) : asset('assets/img/avatars/1.png') }}"
-                    alt="Avatar" class="profile-avatar" style="
-                width: 130px;
-                height: 130px;
-                border-radius: 50%;
-                object-fit: cover;
-                border: 4px solid #980517;
-                box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-                margin-bottom: 10px;
-            ">
-                <!-- Small glow effect -->
-                <div style="
-            position: absolute;
-            top: -5px;
-            left: calc(50% - 70px);
-            width: 140px;
-            height: 140px;
-            border-radius: 50%;
-            background: rgba(152,5,23,0.15);
-            z-index: -1;
-        "></div>
-            </div>
-
-            <!-- Nama & Username -->
-            <h4 class="fw-bold text-center" style="font-size: 1.6rem; color: #980517;">{{ $mahasiswa->nama_mahasiswa ?? 'Nama belum diisi' }}</h4>
-            <p class="username text-center" style="color: #555; font-weight: 500; margin-bottom: 20px;">{{ $user->username }}</p>
-            <hr style="border-top: 1px solid #ffe6e6; margin: 15px 0;">
-
-            <!-- Info Profil -->
-            <div class="profile-info text-start px-3" style="font-size: 0.95rem; color: #444;">
-                <p><strong style="color:#980517;">Fakultas:</strong> {{ $mahasiswa->fakultas ?? '-' }}</p>
-                <p><strong style="color:#980517;">Program Studi:</strong> {{ $mahasiswa->prodi ?? '-' }}</p>
-                <p><strong style="color:#980517;">Angkatan:</strong> {{ $mahasiswa->tahun ?? '-' }}</p>
-            </div>
-        </div>
-
-        <!-- Catatan Card (di bawah profil) -->
-        <div class="card-notes w-100" style="max-width: 700px; background: linear-gradient(to bottom right, #fff0f2, #ffe6e6);">
-            <div class="card-header">Catatan Fakultas & Unit Terkait</div>
-            <div class="card-body p-0">
-                @if($pendaftaran)
-                <table class="table mb-0 table-striped">
-                    <tbody>
-                        <tr>
-                            <th style="width: 40%; background-color:#980517; color:#fff;">Fakultas</th>
-                            <td>{{ $pendaftaran->catatan_fakultas ?? '-' }}</td>
-                        </tr>
-                        <tr>
-                            <th style="width: 40%; background-color:#980517; color:#fff;">Perpustakaan</th>
-                            <td>{{ $pendaftaran->catatan_perpus ?? '-' }}</td>
-                        </tr>
-                        <tr>
-                            <th style="width: 40%; background-color:#980517; color:#fff;">BAAK</th>
-                            <td>{{ $pendaftaran->catatan_baak ?? '-' }}</td>
-                        </tr>
-                        <tr>
-                            <th style="width: 40%; background-color:#980517; color:#fff;">Finance</th>
-                            <td>{{ $pendaftaran->catatan_finance ?? '-' }}</td>
-                        </tr>
-                    </tbody>
-                </table>
-                @else
-                <p class="text-muted text-center p-3">Belum ada catatan dari pihak kampus.</p>
-                @endif
-            </div>
         </div>
     </div>
-    <!-- FOOTER -->
+
     <footer class="content-footer footer bg-footer-theme">
         <div class="container-xxl d-flex flex-wrap justify-content-between py-3 flex-md-row flex-column">
             <div class="mb-2 mb-md-0">
@@ -432,6 +521,22 @@ $hasCatatan = true;
             }
         });
     </script>
+
+    @push('scripts')
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    @if(session('success'))
+    <script>
+        Swal.fire({
+            icon: 'success',
+            title: 'Berhasil!',
+            text: "{{ session('success') }}",
+            confirmButtonColor: '#980517'
+        });
+    </script>
+    @endif
+    @endpush
+
+    @stack('scripts')
 
 </body>
 

@@ -9,19 +9,25 @@ class Mahasiswa extends Model
 {
     use HasFactory;
 
-    protected $table = 'mahasiswa';       // Nama tabel sesuai DB
-    protected $primaryKey = 'id_mahasiswa'; // Primary key sesuai DB
-
-    public $incrementing = true;          // jika auto increment
+    protected $table = 'mahasiswa';
+    protected $primaryKey = 'id_mahasiswa';
+    public $incrementing = true;
     protected $keyType = 'int';
-    public $timestamps = false;           // tipe primary key
+    public $timestamps = false;
 
     protected $fillable = [
         'nim',
         'nama_mahasiswa',
-        'fakultas',
         'prodi',
+        'foto_profil',
         'tahun',
+        'fakultas',
+        'jenjang',
+        'no_telp',
+        'email',
+        'alamat',
+        'tempat_lahir',   // ← sesuai tabel
+        'tanggal_lahir',  // ← sesuai tabel
     ];
 
     public function pendaftaran()

@@ -13,12 +13,9 @@ class Informasi extends Model
     protected $primaryKey = 'id_info';
 
     protected $fillable = [
-        'jadwal_undangan',
         'lokasi',
         'jumlah_wisudawan',
-        'informasi_baak',
-        'info_lulusan',
         'jadwal_wisuda',
-        'review'
+        'informasi_baak',
     ];
 }

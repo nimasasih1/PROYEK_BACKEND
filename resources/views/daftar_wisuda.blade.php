@@ -3,29 +3,49 @@ use App\Models\Mahasiswa;
 use App\Models\PendaftaranWisuda;
 use Illuminate\Support\Facades\Auth;
 
+$mahasiswa = null;
 $hasCatatan = false;
+$terdaftar = false;
 
 if (Auth::check()) {
-$user = Auth::user();
-$mahasiswa = Mahasiswa::where('nim', $user->username)->first();
+    $user = Auth::user();
+    $mahasiswa = Mahasiswa::where('nim', $user->username)->first();
+    
+    // ===== TAMBAHKAN CEK INI =====
+    if (!$mahasiswa) {
+        echo '<script>
+            alert("Data mahasiswa tidak ditemukan! Silakan hubungi admin.");
+            window.location.href = "' . route('beranda') . '";
+        </script>';
+        exit;
+    }
+    
+    if ($mahasiswa) {
+        $pendaftaran = PendaftaranWisuda::where('id_mahasiswa', $mahasiswa->id_mahasiswa)
+            ->latest()
+            ->first();
 
-if ($mahasiswa) {
-$pendaftaran = PendaftaranWisuda::whereHas('mahasiswa', function ($q) use ($mahasiswa) {
-$q->where('nim', $mahasiswa->nim);
-})->latest()->first();
+        if ($pendaftaran) {
+            $terdaftar = true;
+        }
 
-if ($pendaftaran &&
-($pendaftaran->catatan_fakultas ||
-$pendaftaran->catatan_perpus ||
-$pendaftaran->catatan_baak ||
-$pendaftaran->catatan_finance)) {
-$hasCatatan = true;
-}
-}
+        if (
+            $pendaftaran &&
+            (
+                $pendaftaran->catatan_fakultas ||
+                $pendaftaran->catatan_perpus ||
+                $pendaftaran->catatan_baak ||
+                $pendaftaran->catatan_finance
+            )
+        ) {
+            $hasCatatan = true;
+        }
+    }
 }
 @endphp
 
 @include('base.header')
+
 
 <head>
     <style>
@@ -54,6 +74,17 @@ $hasCatatan = true;
             display: flex;
             align-items: center;
             gap: 8px;
+        }
+
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(193, 193, 193, 0.3);
+            z-index: -1;
         }
 
         .nav-link {
@@ -175,6 +206,122 @@ $hasCatatan = true;
         .footer-link:hover {
             color: #980517;
         }
+
+        .form-label {
+            font-weight: 500;
+            color: #566a7f;
+            margin-bottom: 0.5rem;
+        }
+
+        .required-field::after {
+            content: " *";
+            color: red;
+        }
+
+        /* ============================ */
+        /* RESPONSIVE FIX */
+        /* ============================ */
+        @media (max-width: 768px) {
+
+            /* Supaya container ga terlalu sempit */
+            .container {
+                padding-left: 15px;
+                padding-right: 15px;
+            }
+
+            /* Semua form column turun */
+            .col-md-6,
+            .col-md-4,
+            .col-md-7 {
+                width: 100% !important;
+            }
+
+            /* Table tanda tangan auto full width */
+            table {
+                width: 100% !important;
+                margin-top: 10px !important;
+            }
+
+            /* Kolom tanda tangan stacked */
+            table tr td {
+                display: block;
+                width: 100% !important;
+                text-align: center !important;
+                padding-left: 0 !important;
+            }
+
+            /* TTD text biar lebih kecil */
+            table tr td div {
+                margin: 0 auto !important;
+                text-align: center !important;
+                font-size: 11px !important;
+            }
+
+            /* Hilangin padding kiri yang ekstrem */
+            td[style*="padding-left"] {
+                padding-left: 0 !important;
+            }
+
+            /* Card padding biar lega */
+            .card-body {
+                padding: 1.2rem !important;
+            }
+
+            /* Header form */
+            .card-header {
+                font-size: 1rem !important;
+                padding: 10px !important;
+            }
+
+            /* Footer biar selalu center */
+            footer {
+                text-align: center !important;
+                font-size: 10px !important;
+                padding: 10px 5px !important;
+            }
+
+            /* Form label lebih kecil */
+            .form-label {
+                font-size: 14px !important;
+            }
+
+            /* Input tidak terlalu mepet */
+            .form-control {
+                font-size: 14px !important;
+            }
+
+            /* Progress bar lebih tipis */
+            .progress {
+                height: 8px !important;
+            }
+        }
+
+        .fade-step {
+            display: none;
+        }
+
+        .fade-step.show {
+            display: block;
+        }
+
+        .required-field::after {
+            content: " *";
+            color: red;
+        }
+
+        /* Style untuk print */
+        @media print {
+
+            .progress,
+            .btn,
+            .card-header {
+                display: none !important;
+            }
+
+            .signature-section {
+                page-break-before: always;
+            }
+        }
     </style>
 </head>
 
@@ -183,7 +330,7 @@ $hasCatatan = true;
         <div class="row justify-content-center">
             <div class="col-md-7">
                 <div class="card shadow-sm">
-                    <div class="card-header">Form Pendaftaran Wisuda</div>
+                    <div class="card-header">Formulir Permohonan Wisuda</div>
                     <div class="card-body">
 
                         <!-- Progress Bar -->
@@ -191,98 +338,286 @@ $hasCatatan = true;
                             <div id="progressBar" class="progress-bar" role="progressbar" style="width:50%" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100"></div>
                         </div>
 
+                        @if($terdaftar)
+                        <div class="bg-green-50 border border-green-300 rounded-lg p-4 mb-4">
+                            <div class="flex items-start gap-3">
+                                <div class="text-green-600 text-xl">
+                                    🎓
+                                </div>
+                                <div>
+                                    <h4 class="font-semibold text-green-800 mb-1">
+                                        Pendaftaran Wisuda Sudah Terkirim
+                                    </h4>
+
+                                    <p class="text-sm text-green-700">
+                                        Data pendaftaran wisuda Anda telah berhasil dikirim.
+                                        Silakan menunggu proses verifikasi dari pihak terkait.
+                                    </p>
+
+                                    <p class="text-xs text-gray-600 mt-2">
+                                        Tanggal pendaftaran:
+                                        <strong>
+                                            {{ \Carbon\Carbon::parse($latest->created_at)->format('d/m/y') }}
+                                        </strong>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        @else
+
                         <form id="formPendaftaran" action="{{ route('daftar_wisuda.store') }}" method="POST">
                             @csrf
 
                             <!-- STEP 1 -->
                             <div id="step1" class="fade-step show">
-                                <h6 class="text-dark mb-3">Data Mahasiswa</h6>
+                                <h6 class="text-dark mb-3">Mohon lengkapi data yang diminta</h6>
+
+                                <!-- Tanggal Pendaftaran -->
                                 <div class="mb-3">
-                                    <label>NIM</label>
-                                    <input type="text" id="nim" name="nim" class="form-control"
-                                        value="{{ $user->username }}" readonly>
+                                    <label for="tgl_pendaftaran" class="form-label required-field">Tanggal Pendaftaran</label>
+                                    <input type="date" id="tgl_pendaftaran" name="tgl_pendaftaran" class="form-control" required>
+                                    <small class="text-muted">Tanggal hari ini Anda mendaftar</small>
                                 </div>
+
+                                <!-- Tanggal Perkiraan Wisuda -->
                                 <div class="mb-3">
-                                    <label>Nama</label>
-                                    <input type="text" id="nama_mahasiswa" name="nama_mahasiswa" class="form-control"
-                                        value="{{ $mahasiswa->nama_mahasiswa ?? '' }}" readonly>
+                                    <label for="tgl_perkiraan_wisuda" class="form-label required-field">Tanggal Perkiraan Wisuda</label>
+                                    <input type="date" id="tgl_perkiraan_wisuda" name="tgl_perkiraan_wisuda" class="form-control" required>
+                                    <small class="text-muted">Perkiraan tanggal pelaksanaan wisuda</small>
                                 </div>
+
+                                <h6 class="mb-3" style="border-bottom: 3px solid #DCC26A; padding-bottom: 6px; text-align:center;">Informasi Mahasiswa</h6>
+
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label">NIM</label>
+                                        <input type="text" id="nim" name="nim" class="form-control"
+                                            value="{{ $user->username }}" readonly>
+                                    </div>
+
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label">Nama</label>
+                                        <input type="text" id="nama_mahasiswa" name="nama_mahasiswa" class="form-control"
+                                            value="{{ $mahasiswa->nama_mahasiswa ?? '' }}" readonly>
+                                    </div>
+
+                                    <div class="col-md-4 mb-3">
+                                        <label class="form-label">Fakultas</label>
+                                        <input type="text" id="fakultas" name="fakultas" class="form-control"
+                                            value="{{ $mahasiswa->fakultas ?? '' }}" readonly>
+                                    </div>
+
+                                    <div class="col-md-4 mb-3 d-flex flex-column justify-content-end">
+                                        <label>Jenjang</label>
+                                        <select name="jenjang" class="form-select" required>
+                                            <option value="">Pilih Jenjang</option>
+                                            @foreach(['Diploma','Sarjana','Magister','Doktor'] as $j)
+                                            <option value="{{ $j }}" {{ ($mahasiswa->jenjang ?? '')==$j ? 'selected':'' }}>{{ $j }}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+
+                                    <div class="col-md-4 mb-3">
+                                        <label class="form-label">Jurusan</label>
+                                        <input type="text" id="prodi" name="prodi" class="form-control"
+                                            value="{{ $mahasiswa->prodi ?? '' }}" readonly>
+                                    </div>
+                                </div>
+
                                 <div class="mb-3">
-                                    <label>Fakultas</label>
-                                    <input type="text" id="fakultas" name="fakultas" class="form-control"
-                                        value="{{ $mahasiswa->fakultas ?? '' }}" readonly>
+                                    <label for="no_hp" class="form-label required-field">No. HP</label>
+                                    <input type="tel" id="no_hp" name="no_hp" class="form-control"
+                                        placeholder="Contoh: 081234567890"
+                                        pattern="[0-9]{10,13}"
+                                        required>
+                                    <small class="text-muted">Format: 10-13 digit angka</small>
                                 </div>
+
                                 <div class="mb-3">
-                                    <label>Program Studi</label>
-                                    <input type="text" id="prodi" name="prodi" class="form-control"
-                                        value="{{ $mahasiswa->prodi ?? '' }}" readonly>
+                                    <label for="email" class="form-label required-field">Email</label>
+                                    <input type="email" id="email" name="email" class="form-control"
+                                        placeholder="contoh@email.com"
+                                        value="{{ $user->email ?? '' }}"
+                                        required>
                                 </div>
+
                                 <div class="mb-3">
-                                    <label>Tahun Angkatan</label>
-                                    <input type="text" id="tahun" name="tahun" class="form-control"
-                                        value="{{ $mahasiswa->tahun ?? '' }}" readonly>
+                                    <label for="alamat" class="form-label required-field">Alamat</label>
+                                    <input type="text" id="alamat" name="alamat" class="form-control"
+                                        placeholder="Masukkan alamat lengkap"
+                                        value="{{ $mahasiswa->alamat ?? '' }}"
+                                        required>
                                 </div>
-                                <div class="mb-3">
-                                    <label for="tgl_pendaftaran">Tanggal Pendaftaran</label>
-                                    <input type="date" name="tgl_pendaftaran" class="form-control" required>
+
+                                <h6 class="mb-3" style="border-bottom: 3px solid #DCC26A; padding-bottom: 6px; text-align:center;">Beban Studi Terakhir</h6>
+
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label for="judul_skripsi" class="form-label required-field">Judul Skripsi/Tugas Akhir</label>
+                                        <textarea id="judul_skripsi" name="judul_skripsi" class="form-control"
+                                            rows="3"
+                                            placeholder="Masukkan judul lengkap skripsi/tugas akhir Anda"
+                                            required></textarea>
+                                    </div>
+
+                                    <div class="col-md-6 mb-3">
+                                        <label for="ipk" class="form-label required-field">IPK (Final Grade)</label>
+                                        <input type="number" id="ipk" name="ipk" class="form-control"
+                                            step="0.01"
+                                            min="0"
+                                            max="4.00"
+                                            placeholder="Contoh: 3.75"
+                                            required>
+                                        <small class="text-muted">Masukkan IPK dengan format 2 desimal (0.00 - 4.00)</small>
+                                    </div>
                                 </div>
-                                <button type="button" class="btn btn-primary float-end" onclick="nextStep()">Next</button>
+
+                                <!-- SECTION TTD UNTUK PRINT -->
+                                <div class="signature-section mt-5 pt-4" style="border-top: 2px solid #DCC26A;">
+                                    <h6 class="text-center mb-4">Tanda Tangan (Akan ditandatangani saat print)</h6>
+
+                                    <!-- TTD Dosen Pembimbing 
+                                    <table style="width: 100%; border-collapse: collapse; margin-bottom: 30px; text-align:center;">
+                                        <tr>
+                                            <td style="height: 150px; vertical-align: top; padding-top: 20px;">
+                                                <strong>TTD Dosen Pembimbing</strong>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td style="text-align: center;">
+                                                <div style="border-top:1px solid #000; width: 200px; margin: 0 auto; padding-top: 5px; font-size: 12px;">
+                                                    Tanggal: __________________
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </table>
+
+                                    <p style="font-size: 10px; color: #888; text-align: center; margin: 20px 0;">
+                                        Hanya mahasiswa yang telah memenuhi seluruh persyaratan akademik dan non-akademik program studinya hingga akhir semester yang diperbolehkan untuk mengikuti proses kelulusan.
+                                    </p>
+
+                                    TTD Mahasiswa 
+                                    <table style="width: 100%; border-collapse: collapse; margin-bottom: 30px; text-align:center;">
+                                        <tr>
+                                            <td style="height: 150px; vertical-align: top; padding-top: 20px;">
+                                                <strong>TTD Mahasiswa</strong>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td style="text-align: center;">
+                                                <div style="border-top:1px solid #000; width: 200px; margin: 0 auto; padding-top: 5px; font-size: 12px;">
+                                                    Tanggal: __________________
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </table>
+
+                                    TTD Kepala Program Studi 
+                                    <table style="width: 100%; border-collapse: collapse; margin-bottom: 30px; text-align:center;">
+                                        <tr>
+                                            <td style="height: 150px; vertical-align: top; padding-top: 20px;">
+                                                <strong>TTD Kepala Program Studi</strong>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td style="text-align: center;">
+                                                <div style="border-top:1px solid #000; width: 200px; margin: 0 auto; padding-top: 5px; font-size: 12px;">
+                                                    Tanggal: __________________
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </table>
+
+                                    TTD Dekan 
+                                    <table style="width: 100%; border-collapse: collapse; margin-bottom: 30px; text-align:center;">
+                                        <tr>
+                                            <td style="height: 150px; vertical-align: top; padding-top: 20px;">
+                                                <strong>TTD Dekan</strong>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td style="text-align: center;">
+                                                <div style="border-top:1px solid #000; width: 200px; margin: 0 auto; padding-top: 5px; font-size: 12px;">
+                                                    Tanggal: __________________
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </table>
+
+                                     Privacy Notice 
+                                    <div style="margin-top: 40px; padding: 15px; background-color: #f8f9fa; border-radius: 5px;">
+                                        <p style="font-size: 10px; color: #666; text-align: justify; margin: 0;">
+                                            <strong>Pemberitahuan Privasi:</strong> Data pribadi yang diperoleh dari subjek data atau individu akan dimasukkan dan disimpan dalam sistem informasi dan komunikasi yang diotorisasi oleh perusahaan (sekolah), sesuai dengan jangka waktu yang diizinkan berdasarkan peraturan perundang-undangan yang berlaku, dan hanya dapat diakses oleh personel yang berwenang. (Sekolah) telah menerapkan langkah-langkah pengamanan yang tepat secara organisasi, teknis, dan fisik untuk melindungi data pribadi yang dikumpulkan. Selain itu, informasi yang dikumpulkan dapat dibagikan kepada dan tersedia bagi CHED dan/atau pihak terkait lainnya guna mendukung tujuan yang sah, kepentingan yang sah, serta memenuhi kewajiban hukum. Data ini hanya akan digunakan untuk keperluan operasional dan tidak akan diungkapkan kepada pihak lain tanpa persetujuan terlebih dahulu.
+                                        </p>
+                                    </div>
+
+                                     Final Signature 
+                                    <table style="width: 100%; border-collapse: collapse; margin-top: 40px; text-align:center;">
+                                        <tr>
+                                            <td style="height: 150px; vertical-align: top; padding-top: 20px;">
+                                                <strong>Tanda Tangan di atas Nama Jelas</strong>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td style="text-align: center;">
+                                                <div style="border-top:1px solid #000; width: 200px; margin: 0 auto; padding-top: 5px; font-size: 12px;">
+                                                    Nama: _________________________
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </table> -->
+                                </div>
+
+                                <div class="mt-4">
+                                    <button type="button" class="btn btn-primary float-end" onclick="nextStep()">Next</button>
+                                </div>
                             </div>
 
                             <!-- STEP 2 -->
-                           <div id="step2" class="fade-step">
-    <h6 class="text-dark mb-3">Pengambilan Toga</h6>
+                            <div id="step2" class="fade-step">
+                                <h6 class="text-dark mb-3">Pengambilan Toga</h6>
 
-    <!-- Tambah pilihan ukuran lengkap -->
-    <label class="form-label">Ukuran Toga</label>
+                                <div class="mb-3">
+                                    <label class="form-label required-field">Ukuran Toga</label>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="ukuran" id="ukuranAllSize" value="All Size" required>
+                                        <label class="form-check-label" for="ukuranAllSize">All Size</label>
+                                    </div>
+                                </div>
 
-    <div class="form-check">
-        <input class="form-check-input" type="radio" name="ukuran" id="ukuranS" value="S" required>
-        <label class="form-check-label" for="ukuranS">S</label>
-    </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Catatan Tambahan</label>
+                                    <textarea name="catatan" class="form-control" rows="3" placeholder="Masukkan catatan jika ada (opsional)"></textarea>
+                                </div>
 
-    <div class="form-check">
-        <input class="form-check-input" type="radio" name="ukuran" id="ukuranM" value="M">
-        <label class="form-check-label" for="ukuranM">M</label>
-    </div>
+                                <div class="d-flex gap-2 justify-content-end mt-3 flex-wrap">
 
-    <div class="form-check">
-        <input class="form-check-input" type="radio" name="ukuran" id="ukuranL" value="L">
-        <label class="form-check-label" for="ukuranL">L</label>
-    </div>
 
-    <div class="form-check mb-3">
-        <input class="form-check-input" type="radio" name="ukuran" id="ukuranXL" value="XL">
-        <label class="form-check-label" for="ukuranXL">XL</label>
-    </div>
+                                    @if($latest)
+                                    <div class="text-center mt-3">
+                                        <a href="{{ route('pendaftaran.print', $latest->id_pendaftaran) }}"
+                                            class="btn btn-danger px-4">
+                                            Print PDF
+                                        </a>
+                                    </div>
+                                    @endif
 
-    <div class="mb-3">
-        <label>Catatan</label>
-        <textarea name="catatan" class="form-control" rows="3"></textarea>
-    </div>
 
-    <div class="mb-3">
-        <label>Tanda Tangan</label>
-        <canvas id="canvasTTD" style="width:100%; height:150px;"></canvas>
-        <input type="hidden" name="ttd" id="ttdInput">
-        <button type="button" class="btn btn-secondary mt-2" onclick="clearCanvas()">Hapus</button>
-    </div>
 
-    <div class="d-flex gap-2 justify-content-end mt-3 flex-wrap">
-        <button type="button" class="btn btn-primary btn-sm" onclick="prevStep()">
-            <i class="bi bi-arrow-left"></i> Back
-        </button>
-        <a href="{{ route('beranda') }}" class="btn btn-outline-danger btn-sm">
-            <i class="bi bi-house-door"></i> Beranda
-        </a>
-        <button type="submit" class="btn btn-success btn-sm">
-            <i class="bi bi-check-circle"></i> Submit
-        </button>
-    </div>
-</div>
-
+                                    <button type="button" class="btn btn-primary btn-sm" onclick="prevStep()">
+                                        <i class="bi bi-arrow-left"></i> Back
+                                    </button>
+                                    <a href="{{ route('beranda') }}" class="btn btn-outline-danger btn-sm">
+                                        <i class="bi bi-house-door"></i> Beranda
+                                    </a>
+                                    <button type="submit" class="btn btn-success btn-sm">
+                                        <i class="bi bi-check-circle"></i> Submit
+                                    </button>
+                                </div>
+                            </div>
 
                         </form>
+                        @endif
 
                         @if ($errors->any())
                         <div class="mt-3" style="color:red;">
@@ -302,11 +637,9 @@ $hasCatatan = true;
 <footer class="content-footer footer bg-footer-theme">
     <div class="container-xxl d-flex flex-wrap justify-content-between py-3 flex-md-row flex-column">
         <div class="mb-2 mb-md-0">
-            ©
-            <script>
+            © <script>
                 document.write(new Date().getFullYear());
-            </script>
-            MyWebsite | All Rights Reserved
+            </script> Horizon University | All Rights Reserved
         </div>
         <div>
             <a href="https://themeselection.com/license/" class="footer-link me-4" target="_blank">License</a>
@@ -317,7 +650,71 @@ $hasCatatan = true;
 </footer>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+    let currentStep = 1;
 
+    function nextStep() {
+        // Validasi form step 1 sebelum pindah
+        const step1Inputs = document.querySelectorAll('#step1 [required]');
+        let isValid = true;
+
+        step1Inputs.forEach(input => {
+            if (!input.value) {
+                isValid = false;
+                input.classList.add('is-invalid');
+            } else {
+                input.classList.remove('is-invalid');
+            }
+        });
+
+        if (!isValid) {
+            alert('Mohon lengkapi semua field yang wajib diisi!');
+            return;
+        }
+
+        // Pindah ke step 2
+        document.getElementById('step1').classList.remove('show');
+        document.getElementById('step2').classList.add('show');
+        currentStep = 2;
+        updateProgressBar();
+
+        // Scroll ke atas saat pindah step
+        window.scrollTo(0, 0);
+    }
+
+    function prevStep() {
+        // Kembali ke step 1
+        document.getElementById('step2').classList.remove('show');
+        document.getElementById('step1').classList.add('show');
+        currentStep = 1;
+        updateProgressBar();
+
+        // Scroll ke atas saat pindah step
+        window.scrollTo(0, 0);
+    }
+
+    function updateProgressBar() {
+        const progressBar = document.getElementById('progressBar');
+        if (currentStep === 1) {
+            progressBar.style.width = '50%';
+            progressBar.setAttribute('aria-valuenow', '50');
+        } else if (currentStep === 2) {
+            progressBar.style.width = '100%';
+            progressBar.setAttribute('aria-valuenow', '100');
+        }
+    }
+
+    // Set default tanggal pendaftaran ke hari ini
+    document.addEventListener('DOMContentLoaded', function() {
+        currentStep = 1;
+        updateProgressBar();
+
+        // Auto-fill tanggal pendaftaran dengan hari ini
+        const today = new Date().toISOString().split('T')[0];
+        document.getElementById('tgl_pendaftaran').value = today;
+    });
+</script>
 <script>
     let terdaftar = @json($terdaftar);
 
@@ -336,11 +733,45 @@ $hasCatatan = true;
     }
 
     function nextStep() {
-        let nim = document.getElementById('nim').value;
-        if (terdaftar.includes(nim)) {
+        // Validasi form step 1
+        const form = document.getElementById('formPendaftaran');
+        const step1Inputs = document.querySelectorAll('#step1 input[required], #step1 textarea[required], #step1 select[required]');
+
+        let isValid = true;
+        step1Inputs.forEach(input => {
+            if (!input.value) {
+                isValid = false;
+                input.classList.add('is-invalid');
+            } else {
+                input.classList.remove('is-invalid');
+            }
+        });
+
+        if (!isValid) {
+            alert('Mohon lengkapi semua field yang wajib diisi (bertanda *)');
+            return;
+        }
+
+        // Validasi IPK
+        const ipk = document.getElementById('ipk').value;
+        if (ipk < 0 || ipk > 4) {
+            alert('IPK harus antara 0.00 sampai 4.00');
+            return;
+        }
+
+        // Validasi No HP
+        const noHp = document.getElementById('no_hp').value;
+        if (noHp.length < 10 || noHp.length > 13) {
+            alert('Nomor HP harus 10-13 digit');
+            return;
+        }
+
+        // FIX: Cek terdaftar - karena $terdaftar itu boolean, bukan array
+        if (terdaftar === true) {
             alert("Anda sudah terdaftar untuk wisuda, tidak bisa lanjut!");
             return;
         }
+
         let step1 = document.getElementById('step1');
         let step2 = document.getElementById('step2');
 
@@ -360,53 +791,42 @@ $hasCatatan = true;
         });
     }
 
-   // Canvas TTD
-let canvas = document.getElementById('canvasTTD');
-let ctx = canvas.getContext('2d');
-let drawing = false;
-
-canvas.addEventListener('mousedown', startDraw);
-canvas.addEventListener('mouseup', endDraw);
-canvas.addEventListener('mousemove', draw);
-
-function getPos(e) {
-    const rect = canvas.getBoundingClientRect();
-    return {
-        x: (e.clientX - rect.left) * (canvas.width / rect.width),
-        y: (e.clientY - rect.top) * (canvas.height / rect.height)
-    };
-}
-
-function startDraw(e) {
-    drawing = true;
-    const pos = getPos(e);
-    ctx.beginPath();
-    ctx.moveTo(pos.x, pos.y);
-}
-
-function endDraw() {
-    drawing = false;
-    document.getElementById('ttdInput').value = canvas.toDataURL();
-    ctx.beginPath();
-}
-
-function draw(e) {
-    if (!drawing) return;
-    const pos = getPos(e);
-
-    ctx.lineWidth = 2;
-    ctx.lineCap = 'round';
-    ctx.strokeStyle = '#980517';
-
-    ctx.lineTo(pos.x, pos.y);
-    ctx.stroke();
-    ctx.beginPath();
-    ctx.moveTo(pos.x, pos.y);
-}
-
-function clearCanvas() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    document.getElementById('ttdInput').value = '';
-}
-
+    // Validasi real-time untuk IPK
+    document.addEventListener('DOMContentLoaded', function() {
+        const ipkInput = document.getElementById('ipk');
+        if (ipkInput) {
+            ipkInput.addEventListener('input', function() {
+                if (this.value > 4) {
+                    this.value = 4.00;
+                }
+                if (this.value < 0) {
+                    this.value = 0;
+                }
+            });
+        }
+    });
 </script>
+
+@if(session('success_swal'))
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        Swal.fire({
+            icon: 'success',
+            title: 'Pendaftaran Berhasil 🎓',
+            html: `
+                <p style="margin-bottom:6px;">
+                    Terima kasih, <strong>pendaftaran wisuda Anda telah berhasil disimpan</strong>.
+                </p>
+                <p style="font-size:14px;color:#666;">
+                    Silakan menunggu proses verifikasi dari pihak terkait.
+                </p>
+            `,
+            confirmButtonText: 'OK, Mengerti',
+            confirmButtonColor: '#980517',
+            allowOutsideClick: false
+        }).then(() => {
+            window.location.href = 'http://folder_baru_new.test/beranda#';
+        });
+    });
+</script>
+@endif

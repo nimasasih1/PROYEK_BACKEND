@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dashboard Faculty</title>
+  <title>Dashboard Fakultas</title>
 
   <!-- Bootstrap CSS -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -48,7 +48,8 @@
   <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
   <script src="https://cdn.datatables.net/1.11.5/js/dataTables.bootstrap5.min.js"></script>
 
-  
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+
 </head>
 
 <body>
@@ -57,7 +58,7 @@
   <div class="layout-container">
 
     <!-- Sidebar Menu -->
-    <aside id="layout-menu" class="layout-menu menu-vertical menu bg-menu-theme">
+    <aside id="layout-menu" class="layout-menu menu-vertical menu bg-menu-theme position-fixed top-0 start-0 h-100">
       <div class="app-brand demo">
   <a href="{{ route('dashboard.index') }}" class="app-brand-link align-items-center">
     <!-- Ganti SVG ke logo -->
@@ -116,7 +117,7 @@
         <!-- /Sidebar -->
 
         <!-- Main Content -->
-        <div class="layout-page">
+        <div class="layout-page" style="margin-left: 260px;">
           <!-- Navbar -->
           <nav class="layout-navbar container-xxl navbar navbar-expand-xl navbar-detached align-items-center bg-navbar-theme" id="layout-navbar">
   <div class="layout-menu-toggle navbar-nav align-items-xl-center me-3 me-xl-0 d-xl-none">
@@ -129,7 +130,7 @@
     <!-- Judul Halaman -->
     <div class="navbar-nav align-items-center">
       <div class="nav-item d-flex align-items-center">
-        <span class="h5 mb-0">FACULTY</span>
+        <span class="h5 mb-0">FAKULTAS</span>
       </div>
     </div>
 
@@ -139,7 +140,7 @@
       <li class="nav-item dropdown me-3">
         <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
           <img src="{{ asset('assets/img/avatars/1.png') }}" alt="User Avatar" class="rounded-circle" width="36" height="36">
-          <span class="ms-2 fw-semibold text-dark">{{ Auth::user()->name ?? 'User' }}</span>
+          <span class="ms-2 fw-semibold text-dark">{{ Auth::user()->name ?? 'Pengguna' }}</span>
         </a>
         <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
           <li class="dropdown-header">

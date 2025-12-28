@@ -7,29 +7,42 @@ use App\Models\PendaftaranWisuda;
 use App\Models\Skpi;
 use App\Models\Toga;
 use Illuminate\Http\Request;
+use Barryvdh\DomPDF\Facade\Pdf;
+use App\Models\DaftarWisuda;
+
 
 class DaftarWisudaController extends Controller
 {
     public function index()
-    {
-        $user = auth()->user();
-        $mahasiswa = Mahasiswa::where('nim', $user->username)->first();
-
-        $tahun = session('tahun_filter'); // ambil filter tahun dari session
-
-        $data = PendaftaranWisuda::with(['mahasiswa', 'toga'])
-            ->when($tahun, function ($query, $tahun) {
-                return $query->whereHas('mahasiswa', function ($q) use ($tahun) {
-                    $q->where('tahun', $tahun);
-                });
-            })
-            ->orderBy('id_pendaftaran', 'desc')
-            ->get();
-
-        $terdaftar = PendaftaranWisuda::pluck('id_mahasiswa')->toArray();
-
-        return view('daftar_wisuda', compact('user', 'mahasiswa', 'data', 'terdaftar', 'tahun'));
+{
+    $user = auth()->user();
+    $mahasiswa = Mahasiswa::where('nim', $user->username)->first();
+    
+    // ===== GANTI BAGIAN INI =====
+    if (!$mahasiswa) {
+        return redirect()->route('beranda')->with('error', 'Data mahasiswa tidak ditemukan. Silakan hubungi admin untuk melengkapi data Anda.');
     }
+
+    $tahun = session('tahun_filter');
+
+    $data = PendaftaranWisuda::with(['mahasiswa', 'toga'])
+        ->when($tahun, function ($query, $tahun) {
+            return $query->whereHas('mahasiswa', function ($q) use ($tahun) {
+                $q->where('tahun', $tahun);
+            });
+        })
+        ->orderBy('id_pendaftaran', 'desc')
+        ->get();
+
+    $terdaftar = PendaftaranWisuda::pluck('id_mahasiswa')->toArray();
+
+    $latest = PendaftaranWisuda::where('id_mahasiswa', $mahasiswa->id_mahasiswa)
+        ->orderBy('id_pendaftaran', 'desc')
+        ->first();
+
+    return view('daftar_wisuda', compact('user', 'mahasiswa', 'data', 'terdaftar', 'tahun', 'latest'));
+}
+
 
     public function listWisuda()
     {
@@ -107,7 +120,8 @@ class DaftarWisudaController extends Controller
         $request->validate([
             'tgl_pendaftaran' => 'required|date',
             'ukuran'          => 'required|string|max:10',
-            'ttd'             => 'required|string',
+            'judul_skripsi'   => 'required|string',
+            'ipk'             => 'required|numeric|min:0|max:4',
         ]);
 
         $cek = PendaftaranWisuda::where('id_mahasiswa', $mahasiswa->id_mahasiswa)->first();
@@ -115,22 +129,44 @@ class DaftarWisudaController extends Controller
             return redirect()->back()->with('error', 'Anda sudah terdaftar untuk wisuda.');
         }
 
+        // ================= SIMPAN PENDAFTARAN =================
         $pendaftaran = PendaftaranWisuda::create([
-            'id_mahasiswa'    => $mahasiswa->id_mahasiswa,
-            'tgl_pendaftaran' => $request->tgl_pendaftaran,
+            'id_mahasiswa'      => $mahasiswa->id_mahasiswa,
+            'tgl_pendaftaran'   => $request->tgl_pendaftaran,
             'status_pendaftaran' => 'pending',
+            'judul_skripsi'     => $request->judul_skripsi,
+            'ipk'               => $request->ipk,
         ]);
 
+        /*
+    |--------------------------------------------------------------------------
+    | ❌ KODE LAMA (TIDAK DIHAPUS, HANYA DINONAKTIFKAN)
+    |--------------------------------------------------------------------------
+    | get() menghasilkan COLLECTION dan tidak bisa dipakai ambil id
+    */
+        // $pendaftaran = PendaftaranWisuda::with('mahasiswa')->get();
+
+        /*
+    |--------------------------------------------------------------------------
+    | ✅ KODE TAMBAHAN (BENAR & AMAN)
+    |--------------------------------------------------------------------------
+    | pastikan $pendaftaran adalah OBJECT hasil create()
+    */
+        $idPendaftaran = $pendaftaran->id_pendaftaran;
+
+        // ================= SIMPAN TOGA =================
         Toga::create([
-            'id_pendaftaran' => $pendaftaran->id_pendaftaran,
+            'id_pendaftaran' => $idPendaftaran,
             'ukuran'         => $request->ukuran,
-            'catatan'        => $request->catatan,
-            'ttd'            => $request->ttd,
+            'catatan'        => $request->catatan ?? null,
+            'status_list'    => 0, // kolom ada di model → default
         ]);
 
-        return redirect()->route('daftar_wisuda.index')
-            ->with('success', 'Pendaftaran wisuda & data toga berhasil disimpan!');
+        return redirect()
+            ->route('beranda')
+            ->with('success_swal', true);
     }
+
 
     // store2, store3, store4 tetap sama (duplikat) hanya ditambahkan status_pendaftaran default 'pending'
     public function store2(Request $request)
@@ -145,7 +181,6 @@ class DaftarWisudaController extends Controller
         $request->validate([
             'tgl_pendaftaran' => 'required|date',
             'ukuran'          => 'required|string|max:10',
-            'ttd'             => 'required|string',
         ]);
 
         $cek = PendaftaranWisuda::where('id_mahasiswa', $mahasiswa->id_mahasiswa)->first();
@@ -163,11 +198,11 @@ class DaftarWisudaController extends Controller
             'id_pendaftaran' => $pendaftaran->id_pendaftaran,
             'ukuran'         => $request->ukuran,
             'catatan'        => $request->catatan,
-            'ttd'            => $request->ttd,
         ]);
 
-        return redirect()->route('daftar_wisuda.index')
-            ->with('success', 'Pendaftaran wisuda & data toga berhasil disimpan!');
+        return redirect()
+            ->route('beranda')
+            ->with('success_swal', true);
     }
 
     public function store3(Request $request)
@@ -182,7 +217,7 @@ class DaftarWisudaController extends Controller
         $request->validate([
             'tgl_pendaftaran' => 'required|date',
             'ukuran'          => 'required|string|max:10',
-            'ttd'             => 'required|string',
+
         ]);
 
         $cek = PendaftaranWisuda::where('id_mahasiswa', $mahasiswa->id_mahasiswa)->first();
@@ -200,7 +235,7 @@ class DaftarWisudaController extends Controller
             'id_pendaftaran' => $pendaftaran->id_pendaftaran,
             'ukuran'         => $request->ukuran,
             'catatan'        => $request->catatan,
-            'ttd'            => $request->ttd,
+
         ]);
 
         return redirect()->route('daftar_wisuda.index')
@@ -219,7 +254,7 @@ class DaftarWisudaController extends Controller
         $request->validate([
             'tgl_pendaftaran' => 'required|date',
             'ukuran'          => 'required|string|max:10',
-            'ttd'             => 'required|string',
+
         ]);
 
         $cek = PendaftaranWisuda::where('id_mahasiswa', $mahasiswa->id_mahasiswa)->first();
@@ -237,7 +272,7 @@ class DaftarWisudaController extends Controller
             'id_pendaftaran' => $pendaftaran->id_pendaftaran,
             'ukuran'         => $request->ukuran,
             'catatan'        => $request->catatan,
-            'ttd'            => $request->ttd,
+
         ]);
 
         return redirect()->route('daftar_wisuda.index')
@@ -256,9 +291,10 @@ class DaftarWisudaController extends Controller
         Skpi::where('id_mahasiswa', $idMahasiswa)->delete();
         $wisuda->delete();
 
-        return redirect()->back()->with('success', 'Data wisuda & pengambilan berhasil dihapus!');
+        return redirect()
+            ->route('viewmahasiswa.daftar_wisuda1.wisuda1')
+            ->with('success_swal', true);
     }
-
 
     public function update(Request $request, $id)
     {
@@ -294,12 +330,15 @@ class DaftarWisudaController extends Controller
             'tgl_pendaftaran' => 'required|date',
             'ukuran'          => 'required|string|max:10',
             'catatan'         => 'nullable|string',
-            'ttd'             => 'nullable|file|mimes:jpg,jpeg,png|max:2048',
+            'ipk' => 'nullable|numeric|min:0|max:4',             // BARU
+            'judul_skripsi' => 'nullable|string',
         ]);
 
         // Update tanggal pendaftaran
         $pendaftaran->update([
             'tgl_pendaftaran' => $request->tgl_pendaftaran,
+            'ipk' => $request->ipk,               // BARU
+            'judul_skripsi' => $request->judul_skripsi,  // BARU
         ]);
 
         // Update toga
@@ -311,10 +350,7 @@ class DaftarWisudaController extends Controller
             ];
 
             // Upload ttd jika ada
-            if ($request->hasFile('ttd')) {
-                $path = $request->file('ttd')->store('ttd', 'public');
-                $dataToga['ttd'] = '/storage/' . $path;
-            }
+
 
             $toga->update($dataToga);
         }
@@ -456,40 +492,88 @@ class DaftarWisudaController extends Controller
     }
 
     public function selesai(Request $request)
-{
-    $tahun = session('tahun_filter');
-    $filter = $request->get('filter');
+    {
+        $tahun = session('tahun_filter');
+        $filter = $request->get('filter');
 
-    $data = PendaftaranWisuda::with(['mahasiswa', 'toga'])
-        ->when($tahun, function ($q) use ($tahun) {
-            $q->whereHas('mahasiswa', function ($q2) use ($tahun) {
-                $q2->where('tahun', $tahun);
-            });
-        })
-        ->where('is_valid_finance', 1)
-        ->where('is_valid_perpus', 1)
-        ->where('is_valid_fakultas', 1)
-        ->where('is_valid_baak', 1) // ✅ filter utama Selesai
-        ->when($filter, function ($q) use ($filter) {
-            if ($filter === 'finance') {
-                $q->where('is_valid_finance', 1);
-            } elseif ($filter === 'perpus') {
-                $q->where('is_valid_perpus', 1);
-            } elseif ($filter === 'fakultas') {
-                $q->where('is_valid_fakultas', 1);
-            } elseif ($filter === 'baak') {
-                $q->where('is_valid_baak', 1);
-            }
-        })
-        ->orderBy('id_pendaftaran', 'desc')
-        ->get();
+        $data = PendaftaranWisuda::with(['mahasiswa', 'toga'])
+            ->when($tahun, fn($q) => $q->whereHas('mahasiswa', fn($q2) => $q2->where('tahun', $tahun)))
+            ->whereHas('toga', fn($q) => $q->whereIn('status_list', [0, 1]))
+            ->where('is_valid_finance', 1)
+            ->where('is_valid_perpus', 1)
+            ->where('is_valid_fakultas', 1)
+            ->where('is_valid_baak', 1)
+            ->when($filter, function ($q) use ($filter) {
+                if ($filter === 'finance') $q->where('is_valid_finance', 1);
+                elseif ($filter === 'perpus') $q->where('is_valid_perpus', 1);
+                elseif ($filter === 'fakultas') $q->where('is_valid_fakultas', 1);
+                elseif ($filter === 'baak') $q->where('is_valid_baak', 1);
+            })
+            ->orderBy('id_pendaftaran', 'desc')
+            ->get();
 
-    $tahunList = Mahasiswa::select('tahun')
-        ->distinct()
-        ->orderBy('tahun', 'desc')
-        ->pluck('tahun');
 
-    return view('viewmahasiswa.selesai', compact('data', 'tahun', 'tahunList', 'filter'));
-}
+        $tahunList = Mahasiswa::select('tahun')
+            ->distinct()
+            ->orderBy('tahun', 'desc')
+            ->pluck('tahun');
 
+        return view('viewmahasiswa.selesai', compact('data', 'tahun', 'tahunList', 'filter'));
+    }
+
+    public function selesaiToga()
+    {
+        // Ambil semua pendaftaran wisuda yang status toga sudah selesai
+        $data = PendaftaranWisuda::with(['mahasiswa', 'toga'])
+            ->whereHas('toga', fn($q) => $q->where('status_list', 1))
+            ->orderBy('id_pendaftaran', 'desc')
+            ->get();
+
+        return view('viewmahasiswa.togaselesai', compact('data'));
+    }
+
+    public function print($id)
+    {
+        $data = PendaftaranWisuda::with(['mahasiswa', 'toga'])->findOrFail($id);
+
+        return Pdf::loadView('viewmahasiswa.wisuda1_print', compact('data'))
+            ->setPaper('A4', 'portrait')
+            ->stream();
+    }
+
+    public function updateStatusList($id, Request $request)
+    {
+        // Debug: log ID yang diterima
+        \Log::info('Update Status List ID:', ['id' => $id, 'value' => $request->value]);
+
+        // Coba cari berdasarkan id_pengambilan
+        $toga = \App\Models\Toga::find($id);
+
+        // Jika tidak ditemukan, cari berdasarkan id_pendaftaran
+        if (!$toga) {
+            $toga = \App\Models\Toga::where('id_pendaftaran', $id)->first();
+        }
+
+        if (!$toga) {
+            \Log::error('Data toga tidak ditemukan untuk ID:', ['id' => $id]);
+            return response()->json([
+                'error' => 'Data toga tidak ditemukan',
+                'debug_id' => $id
+            ], 404);
+        }
+
+        $toga->status_list = $request->value == 1 ? 1 : 0;
+        $toga->save();
+
+        \Log::info('Status list berhasil diupdate:', [
+            'id_pengambilan' => $toga->id_pengambilan,
+            'id_pendaftaran' => $toga->id_pendaftaran,
+            'status_list' => $toga->status_list
+        ]);
+
+        return response()->json([
+            'success' => 'Status list berhasil diupdate',
+            'status' => $toga->status_list
+        ]);
+    }
 }

@@ -15,6 +15,7 @@ class Toga extends Model
         'ukuran',
         'catatan',
         'ttd',
+        'status_list',
     ];
 
     /**
