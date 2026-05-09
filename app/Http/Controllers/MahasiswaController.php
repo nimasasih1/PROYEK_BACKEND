@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\Mahasiswa;
 use App\Models\PendaftaranWisuda;
 use App\Models\Skpi;
+use Illuminate\Support\Facades\Storage;
 
 class MahasiswaController extends Controller
 {
@@ -49,24 +50,22 @@ class MahasiswaController extends Controller
             })
             ->get();
 
-        return view('viewmahasiswa.profil_mahasiswa', compact('mahasiswa', 'tahunList', 'tahun', 'wisuda', 'skpi'));
+        return view('viewmahasiswa.profil_mahasiswa', compact('mahasiswa', 'tahunList', 'tahun', 'wisuda', 'skpi', 'data'));
     }
 
     // 🟢 Tampilkan profil mahasiswa (user)
-
     public function show()
     {
         $user = Auth::user();
 
-        // Ambil data mahasiswa berdasarkan username yang login
         $mahasiswa = Mahasiswa::where('nim', $user->username)->first();
 
         $pendaftaran = null;
         $hasCatatan = false;
+        $alreadySubmitted = false;
 
         if ($mahasiswa) {
-            // Pastikan hanya ambil pendaftaran kalau mahasiswa ada
-            $pendaftaran = \App\Models\PendaftaranWisuda::where('id_mahasiswa', $mahasiswa->id_mahasiswa)
+            $pendaftaran = PendaftaranWisuda::where('id_mahasiswa', $mahasiswa->id_mahasiswa)
                 ->latest()
                 ->first();
 
@@ -79,17 +78,17 @@ class MahasiswaController extends Controller
             ) {
                 $hasCatatan = true;
             }
+
+            // Check if already submitted testimonial
+            $alreadySubmitted = \App\Models\KesanModel::where('nim', $mahasiswa->nim)->exists();
         }
 
-        // $mahasiswa bisa null, blade nanti handle tampilannya
-        return view('profil_mahasiswa', compact('user', 'mahasiswa', 'pendaftaran', 'hasCatatan'));
+        return view('profil_mahasiswa', compact('user', 'mahasiswa', 'pendaftaran', 'hasCatatan', 'alreadySubmitted'));
     }
-
 
     // 🟡 EDIT untuk ADMIN
     public function edit($nim = null)
     {
-        // admin bisa mengedit data siapa saja
         $mahasiswa = Mahasiswa::where('nim', $nim)->first();
 
         if (!$mahasiswa) {
@@ -113,37 +112,242 @@ class MahasiswaController extends Controller
     }
 
     // 🔵 Simpan atau update profil (POST)
+
     public function store(Request $request)
+    {
+        // 1. Validasi data
+        $validatedData = $request->validate([
+            'nim'            => 'required|string|max:20',
+            'nama_mahasiswa' => 'required|string|max:255',
+            'fakultas'       => 'required|string|max:255',
+            'prodi'          => 'required|string|max:255',
+            'tahun'          => 'required|integer|min:1900|max:' . (date('Y') + 1),
+            'jenjang'        => 'required|string|max:50',
+            'no_telp'        => 'nullable|string|max:20',
+            'email'          => ['required', 'email', 'regex:/^[a-zA-Z0-9._%+-]+@(gmail\.com|krw\.horizon\.ac\.id)$/', 'max:255'],
+            'alamat'         => 'nullable|string|max:500',
+            'tempat_lahir'   => 'nullable|string|max:50',
+            'tanggal_lahir'  => 'nullable|date',
+            'foto_profil'    => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+        ]);
+
+        $nim = $validatedData['nim'];
+
+        // 2. Upload Foto
+        if ($request->hasFile('foto_profil')) {
+            $file = $request->file('foto_profil');
+
+            if (!$file || !$file->isValid()) {
+                return back()->withErrors(['foto_profil' => 'The profile photo file is invalid or failed to upload.'])->withInput();
+            }
+
+            $extension = $file->getClientOriginalExtension();
+            $fileName = $nim . '.' . $extension;
+
+            // Tentukan path langsung di app/public/profil_mahasiswa
+            $destinationPath = public_path('profil_mahasiswa');
+
+            // Buat folder jika belum ada
+            if (!file_exists($destinationPath)) {
+                mkdir($destinationPath, 0755, true);
+            }
+
+            // Hapus foto lama jika ada
+            $mahasiswaLama = Mahasiswa::where('nim', $nim)->first();
+            if ($mahasiswaLama && !empty($mahasiswaLama->foto_profil)) {
+                $oldPath = public_path($mahasiswaLama->foto_profil); // langsung path absolut
+                if (file_exists($oldPath) && !empty($oldPath)) {
+                    unlink($oldPath);
+                }
+            }
+
+            // Pindahkan file baru ke folder yang benar
+            $file->move($destinationPath, $fileName);
+
+            // Simpan path relatif ke database, misal: 'profil_mahasiswa/nim.jpg'
+            $validatedData['foto_profil'] = 'profil_mahasiswa/' . $fileName;
+        } else {
+            unset($validatedData['foto_profil']);
+        }
+
+        // 3. UpdateOrCreate Mahasiswa
+        $mahasiswa = Mahasiswa::updateOrCreate(
+            ['nim' => $nim],
+            $validatedData
+        );
+
+        // 4. Redirect sukses
+        return redirect()->route('profil_mahasiswa.show')
+            ->with('success', 'Student profile with NIM ' . $mahasiswa->nim . ' has been updated successfully!');
+    }
+
+    public function update(Request $request, $nim)
     {
         $request->validate([
             'nama_mahasiswa' => 'required|string|max:255',
             'fakultas'       => 'required|string|max:255',
             'prodi'          => 'required|string|max:255',
             'tahun'          => 'required|integer',
+            'jenjang'        => 'required|string|max:50',
+            'no_telp'        => 'nullable|string|max:20',
+            'email'          => ['nullable', 'email', 'regex:/^[a-zA-Z0-9._%+-]+@(gmail\.com|krw\.horizon\.ac\.id)$/'],
+            'alamat'         => 'nullable|string|max:500',
+
+            // ✔ Ditambahkan agar sesuai tabel
+            'tempat_lahir'   => 'nullable|string|max:50',
+            'tanggal_lahir'  => 'nullable|date',
         ]);
 
-        $user = Auth::user();
+        $mahasiswa = Mahasiswa::where('nim', $nim)->firstOrFail();
 
-        Mahasiswa::updateOrCreate(
-            ['nim' => $user->username],
-            [
-                'nama_mahasiswa' => $request->nama_mahasiswa,
-                'fakultas'       => $request->fakultas,
-                'prodi'          => $request->prodi,
-                'tahun'          => $request->tahun,
-            ]
-        );
+        $mahasiswa->update([
+            'nama_mahasiswa' => $request->nama_mahasiswa,
+            'fakultas'       => $request->fakultas,
+            'prodi'          => $request->prodi,
+            'tahun'          => $request->tahun,
+            'jenjang'        => $request->jenjang,
+            'no_telp'        => $request->no_telp,
+            'email'          => $request->email,
+            'alamat'         => $request->alamat,
 
-        return redirect()->route('profil_mahasiswa.show')->with('success', 'Profil mahasiswa berhasil diperbarui!');
+            // ✔ Sesuai tabel
+            'tempat_lahir'   => $request->tempat_lahir,
+            'tanggal_lahir'  => $request->tanggal_lahir,
+        ]);
+
+        return redirect()
+            ->route('viewmahasiswa.profil_mahasiswa.index')
+            ->with('success1_swal', true);
     }
 
     // 🔴 Hapus data mahasiswa (admin)
     public function destroy($nim)
+{
+    $mahasiswa = Mahasiswa::where('nim', $nim)->firstOrFail();
+
+    // ✅ Hapus data terkait dulu (urutan penting!)
+    $pendaftaran = \App\Models\PendaftaranWisuda::where('id_mahasiswa', $mahasiswa->id_mahasiswa)->get();
+    
+    foreach ($pendaftaran as $p) {
+        // Hapus toga
+        \App\Models\Toga::where('id_pendaftaran', $p->id_pendaftaran)->delete();
+        // Hapus pengambilan
+        \DB::table('pengambilan')->where('id_pendaftaran', $p->id_pendaftaran)->delete();
+    }
+    
+    // Hapus pendaftaran wisuda
+    \App\Models\PendaftaranWisuda::where('id_mahasiswa', $mahasiswa->id_mahasiswa)->delete();
+    
+    // Hapus SKPI
+    \App\Models\Skpi::where('id_mahasiswa', $mahasiswa->id_mahasiswa)->delete();
+
+    // ✅ Baru hapus mahasiswa
+    $mahasiswa->delete();
+
+    return redirect()
+    ->route('viewmahasiswa.profil_mahasiswa.index')
+    ->with('success_swal', true);
+}
+
+    public function indexKesan()
     {
-        $mahasiswa = Mahasiswa::where('nim', $nim)->first();
-        if ($mahasiswa) {
-            $mahasiswa->delete();
+        $kesan = \App\Models\KesanModel::all();
+        // Ambil data mahasiswa yang login untuk form tambah
+        $user = \Illuminate\Support\Facades\Auth::user();
+        $mahasiswa = \App\Models\Mahasiswa::where('nim', $user->username)->first();
+
+        return view('dashboard.kesan_mahasiswa', compact('kesan', 'mahasiswa'));
+    }
+
+    // MahasiswaController.php
+    public function showKesanJson($id)
+    {
+        $kesan = \App\Models\KesanModel::findOrFail($id);
+        return response()->json($kesan);
+    }
+
+
+    public function storeKesan(Request $request)
+    {
+        $request->validate([
+            'nim'     => 'required|string|max:20',
+            'nama'    => 'required|string|max:255',
+            'kesan'   => 'required|string',
+            'tanggal' => 'required|date',
+        ]);
+
+        // Check again for security
+        $exists = \App\Models\KesanModel::where('nim', $request->nim)->exists();
+        if ($exists) {
+            return back()->with('error', 'You have already sent a testimonial!');
         }
-        return redirect()->back()->with('success', 'Data mahasiswa berhasil dihapus!');
+
+        \App\Models\KesanModel::create([
+            'nim'     => $request->nim,
+            'nama'    => $request->nama,
+            'kesan'   => $request->kesan,
+            'tanggal' => $request->tanggal,
+            'status'  => 0, // Default to 0 (Draft/Pending Approval)
+        ]);
+
+        return back()->with('success', 'Impression successfully sent!');
+    }
+
+    public function editKesan($id)
+    {
+        $kesan = \App\Models\KesanModel::findOrFail($id);
+        return response()->json($kesan);
+    }
+
+    // Update Kesan
+    public function updateKesan(Request $request, $id)
+    {
+        $request->validate([
+            'kesan'   => 'required|string',
+            'tanggal' => 'required|date',
+        ]);
+
+        $kesan = \App\Models\KesanModel::findOrFail($id);
+        $kesan->update([
+            'kesan'   => $request->kesan,
+            'tanggal' => $request->tanggal,
+        ]);
+
+        return back()->with('success', 'Impression successfully updated!');
+    }
+
+    // Hapus Kesan
+    public function destroyKesan($id)
+    {
+        $kesan = \App\Models\KesanModel::findOrFail($id);
+        $kesan->delete();
+
+        return back()->with('success', 'Impression successfully deleted!');
+    }
+
+    public function up()
+    {
+        Schema::table('kesan_models', function (Blueprint $table) {
+            // Default 0 (Draft), 1 (Publish)
+            $table->tinyInteger('status')->default(0)->after('kesan');
+        });
+    }
+
+    public function down()
+    {
+        Schema::table('kesan_models', function (Blueprint $table) {
+            $table->dropColumn('status');
+        });
+    }
+
+    public function toggleStatusKesan($id)
+    {
+        $kesan = \App\Models\KesanModel::findOrFail($id);
+
+        // Toggle antara 0 dan 1
+        $kesan->status = ($kesan->status == 1) ? 0 : 1;
+        $kesan->save();
+
+        return back()->with('success', 'Status successfully changed!');
     }
 }

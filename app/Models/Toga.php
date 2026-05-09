@@ -14,7 +14,9 @@ class Toga extends Model
         'id_pendaftaran',
         'ukuran',
         'catatan',
+        'kode_pen',
         'ttd',
+        'status_list',
     ];
 
     /**

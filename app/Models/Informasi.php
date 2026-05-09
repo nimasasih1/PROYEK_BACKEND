@@ -13,12 +13,15 @@ class Informasi extends Model
     protected $primaryKey = 'id_info';
 
     protected $fillable = [
-        'jadwal_undangan',
         'lokasi',
         'jumlah_wisudawan',
-        'informasi_baak',
-        'info_lulusan',
+        'mahasiswa_aktif',
+        'calon_lulusan',
         'jadwal_wisuda',
-        'review'
+        'informasi_baak',
+        'foto_gallery',
+        'foto_gallery_2',
+        'foto_gallery_3',
+        'foto_gallery_4',
     ];
 }

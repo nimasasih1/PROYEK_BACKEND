@@ -1,117 +1,317 @@
 @extends('layouts.dashboard')
 
 @section('content')
-<div class="container-fluid">
-    <h2 class="mb-4">Dashboard Data Wisuda (Selesai)</h2>
 
-    <div class="table-responsive" style="overflow-x: auto; max-width: 100%;">
-    <table id="wisudaSelesaiTable" class="table table-bordered display nowrap" style="width:100%">
-        <thead class="table-dark">
-            <tr>
-                <th>No</th>
-                <th>Nama Mahasiswa</th>
-                <th>NIM</th>
-                <th>Fakultas</th>
-                <th>Prodi</th>
-                <th>Tahun</th>
-                <th>Tanggal Pendaftaran</th>
-                <th>Ukuran</th>
-                <th>Catatan</th>
-                <th>Tanda Tangan</th>
-                <th>Finance</th>
-                <th>Perpus</th>
-                <th>Fakultas</th>
-                <th>BAAK</th>
-                <th>Catatan Fakultas</th>
-                <th>Catatan Finance</th>
-                <th>Catatan Perpus</th>
-                <th>Catatan BAAK</th>
-                <th>Status</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach ($data->unique('id_pendaftaran') as $pendaftaran)
-            @if($pendaftaran->is_valid_finance && $pendaftaran->is_valid_perpus && $pendaftaran->is_valid_fakultas && $pendaftaran->is_valid_baak)
-            <tr>
-                <td>{{ $loop->iteration }}</td>
-                <td>{{ $pendaftaran->mahasiswa->nama_mahasiswa }}</td>
-                <td>{{ $pendaftaran->mahasiswa->nim }}</td>
-                <td>{{ $pendaftaran->mahasiswa->fakultas }}</td>
-                <td>{{ $pendaftaran->mahasiswa->prodi }}</td>
-                <td>{{ $pendaftaran->mahasiswa->tahun }}</td>
-                <td>{{ $pendaftaran->tgl_pendaftaran ?? '-' }}</td>
-                <td>{{ $pendaftaran->toga->ukuran ?? '-' }}</td>
-                <td>{{ $pendaftaran->toga->catatan ?? '-' }}</td>
-                <td>
-                    @if (!empty($pendaftaran->toga->ttd))
-                    <img src="{{ $pendaftaran->toga->ttd }}" alt="Tanda Tangan" width="150">
-                    @else
-                    -
+<style>
+    /* Badge Status */
+    .badge-selesai {
+        background: linear-gradient(120deg, #ffffff, #f3f3f3);
+        color: #444;
+        border: 1px solid #dcdcdc;
+        padding: 6px 14px;
+        border-radius: 12px;
+        font-weight: 600;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Card Wrapper */
+    .card-custom {
+        background: white;
+        border-radius: 15px;
+        padding: 20px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+        margin-bottom: 20px;
+    }
+
+    /* Dropdown Catatan */
+    .dropdown-menu-custom {
+        border-radius: 12px !important;
+        box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.15);
+        border: none;
+        background: #ffffff;
+    }
+
+    .dropdown-menu-custom li strong {
+        color: #980517;
+    }
+
+    /* Tombol Catatan */
+    .btn-catatan {
+        background: #ffffff;
+        border: 1px solid #dadada;
+        transition: 0.2s;
+    }
+
+    .btn-catatan:hover {
+        background: #f8f8f8;
+        border-color: #c7c7c7;
+    }
+
+    /* Table */
+    table.dataTable thead th {
+        background: #980517 !important;
+        color: white !important;
+        text-align: center;
+    }
+
+    table.dataTable tbody tr:hover {
+        background-color: #f7f7f7 !important;
+    }
+</style>
+
+<div class="container-fluid">
+
+    <div class="card-custom">
+        <h2 class="mb-4" style="color:#980517; font-weight:700;" title="Rekap Selesai Daftar Wisuda">Graduation Completion Recap</h2>
+
+        <div class="table-responsive" style="overflow-x: auto;">
+            <table id="wisudaSelesaiTable" class="table table-striped table-hover table-bordered nowrap" style="width:100%">
+                <thead>
+                    <tr>
+                        <th title="Nomor">No</th>
+                        <th title="Status Pengambilan Toga" data-bs-toggle="tooltip">Gown Pickup</th>
+                        <th title="Nama Mahasiswa" data-bs-toggle="tooltip">Student Name</th>
+                        <th title="Nomor Induk Mahasiswa" data-bs-toggle="tooltip">Student ID</th>
+                        <th title="Fakultas" data-bs-toggle="tooltip">Faculty</th>
+                        <th title="Program Studi" data-bs-toggle="tooltip">Study Program</th>
+                        <th title="Tahun Masuk" data-bs-toggle="tooltip">Year</th>
+                        <th title="Tanggal Pendaftaran Wisuda" data-bs-toggle="tooltip">Registration Date</th>
+                        <th title="Ukuran Toga Wisuda" data-bs-toggle="tooltip">Gown Size</th>
+                        <th title="Catatan Toga" data-bs-toggle="tooltip">Gown Notes</th>
+                        <th title="Validasi Keuangan" data-bs-toggle="tooltip">Finance</th>
+                        <th title="Validasi Perpustakaan" data-bs-toggle="tooltip">Library</th>
+                        <th title="Validasi Fakultas" data-bs-toggle="tooltip">Faculty Val.</th>
+                        <th title="Validasi BAAK" data-bs-toggle="tooltip">BAAK</th>
+                        <th title="Catatan dari Semua Departemen" data-bs-toggle="tooltip">Remarks</th>
+                        <th title="Status Kelulusan" data-bs-toggle="tooltip">Status</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    @foreach ($data->unique('id_pendaftaran') as $pendaftaran)
+                    @if($pendaftaran->is_valid_finance
+                    && $pendaftaran->is_valid_perpus
+                    && $pendaftaran->is_valid_fakultas
+                    && $pendaftaran->is_valid_baak)
+
+                    <tr style="text-align: center; vertical-align: middle;">
+                        <td>{{ $loop->iteration }}</td>
+                        <td>
+                            @if(isset($pendaftaran->toga))
+                            <input type="checkbox"
+                                class="toggle-status-list"
+                                data-id="{{ $pendaftaran->toga->id_pengambilan }}"
+                                {{ $pendaftaran->toga->status_list == 1 | 0 ? 'checked' : '' }}>
+                            @else
+                            <span class="text-muted">-</span>
+                            @endif
+                        </td>
+                        <td>{{ $pendaftaran->mahasiswa->nama_mahasiswa }}</td>
+                        <td>{{ $pendaftaran->mahasiswa->nim }}</td>
+                        <td>{{ $pendaftaran->mahasiswa->fakultas }}</td>
+                        <td>{{ $pendaftaran->mahasiswa->prodi }}</td>
+                        <td>{{ $pendaftaran->mahasiswa->tahun }}</td>
+                        <td>{{ $pendaftaran->tgl_pendaftaran ?? '-' }}</td>
+                        <td>{{ $pendaftaran->toga->ukuran ?? '-' }}</td>
+                        <td>{{ $pendaftaran->toga->catatan ?? '-' }}</td>
+
+                        <td>✔</td>
+                        <td>✔</td>
+                        <td>✔</td>
+                        <td>✔</td>
+
+                        <td>
+                            <!-- Tombol Lihat Catatan -->
+                            <button class="btn btn-catatan btn-sm"
+                                data-bs-toggle="modal"
+                                data-bs-target="#catatanModal{{ $pendaftaran->id_pendaftaran }}"
+                                title="Lihat semua catatan departemen">
+                                View Remarks
+                            </button>
+
+                            <!-- Modal -->
+                            <div class="modal fade" id="catatanModal{{ $pendaftaran->id_pendaftaran }}" tabindex="-1" aria-hidden="true">
+                                <div class="modal-dialog modal-dialog-centered modal-lg">
+                                    <div class="modal-content"
+                                        style="border-radius:12px; overflow:visible; background:white; color:black; box-shadow:0 8px 25px rgba(0,0,0,0.15);">
+                                        <div class="modal-header"
+                                            style="background:white; color:black; border-bottom:none; border-top-left-radius:12px; border-top-right-radius:12px;">
+                                            <h5 class="modal-title" style="font-weight:600;" title="Catatan untuk mahasiswa ini">
+                                                Remarks — {{ $pendaftaran->mahasiswa->nama_mahasiswa }}
+                                            </h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                        </div>
+                                        <div class="modal-body" style="padding:20px; color:black; font-size:14px;">
+                                            <table class="table table-striped table-bordered"
+                                                style="background:white; color:black; border-radius:8px; overflow:hidden;">
+                                                <thead style="background:white; color:black;">
+                                                    <tr>
+                                                        <th title="Departemen">Department</th>
+                                                        <th title="Isi Catatan">Notes</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr>
+                                                        <td title="Catatan dari Fakultas">Faculty</td>
+                                                        <td>{{ $pendaftaran->catatan_fakultas ?? '-' }}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td title="Catatan dari Keuangan">Finance</td>
+                                                        <td>{{ $pendaftaran->catatan_finance ?? '-' }}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td title="Catatan dari Perpustakaan">Library</td>
+                                                        <td>{{ $pendaftaran->catatan_perpus ?? '-' }}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td title="Catatan dari BAAK">BAAK</td>
+                                                        <td>{{ $pendaftaran->catatan_baak ?? '-' }}</td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+
+                        <td>
+                            <span class="badge badge-selesai" title="Semua validasi telah selesai">Completed ✔</span>
+                        </td>
+                    </tr>
+
                     @endif
-                </td>
-                <td>✔</td>
-                <td>✔</td>
-                <td>✔</td>
-                <td>✔</td>
-                <td>{{ $pendaftaran->catatan_fakultas ?? '-' }}</td>
-                <td>{{ $pendaftaran->catatan_finance ?? '-' }}</td>
-                <td>{{ $pendaftaran->catatan_baak ?? '-' }}</td>
-                <td>{{ $pendaftaran->catatan_perpus ?? '-' }}</td>
-                <td><span class="badge bg-success">Selesai</span></td>
-            </tr>
-            @endif
-            @endforeach
-        </tbody>
-    </table>
+                    @endforeach
+                </tbody>
+
+            </table>
+        </div>
     </div>
+
 </div>
 @endsection
+
 
 @push('scripts')
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
 <script src="https://cdn.datatables.net/1.11.5/js/dataTables.bootstrap5.min.js"></script>
+
 <script>
     $(document).ready(function() {
         $('#wisudaSelesaiTable').DataTable({
             scrollX: true,
+            responsive: true,
             autoWidth: false,
-            responsive: false,
             language: {
-                search: "Cari:",
-                lengthMenu: "Tampilkan _MENU_ data per halaman",
-                zeroRecords: "Tidak ada data yang ditemukan",
-                info: "Menampilkan halaman _PAGE_ dari _PAGES_",
-                infoEmpty: "Tidak ada data yang tersedia",
-                infoFiltered: "(difilter dari _MAX_ total data)",
+                search: "Search:",
+                lengthMenu: "Show _MENU_ entries",
+                zeroRecords: "No data found",
+                info: "Page _PAGE_ of _PAGES_",
+                infoEmpty: "No entries available",
+                infoFiltered: "(filtered from _MAX_ total entries)",
                 paginate: {
-                    first: "Pertama",
-                    last: "Terakhir",
-                    next: "Selanjutnya",
-                    previous: "Sebelumnya"
+                    next: "→",
+                    previous: "←"
                 }
+            }
+        });
+
+        // Initialize tooltips
+        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"], [title]'));
+        tooltipTriggerList.map(function(el) {
+            return new bootstrap.Tooltip(el, { trigger: 'hover', placement: 'top' });
+        });
+    });
+
+    $(document).on('change', '.toggle-status-list', function() {
+        let checkbox = $(this);
+        let id = checkbox.data('id');
+        let value = checkbox.is(':checked') ? 1 : 0;
+
+        console.log("Mengupdate status list:", {
+            id: id,
+            value: value
+        });
+
+        // Validasi ID
+        if (!id || id === undefined || id === null) {
+            console.error("ID tidak valid:", id);
+            alert("ID data tidak valid. Silakan refresh halaman.");
+            checkbox.prop('checked', !checkbox.prop('checked')); // Kembalikan state
+            return;
+        }
+
+        // Non-aktifkan checkbox sementara
+        checkbox.prop('disabled', true);
+
+        $.ajax({
+            url: '/wisuda1/update-status-list/' + id,
+            method: 'POST',
+            data: {
+                _token: '{{ csrf_token() }}',
+                value: value
+            },
+            success: function(res) {
+                console.log("Success:", res);
+                // Tambahkan animasi visual feedback
+                checkbox.closest('td').addClass('bg-success-subtle');
+                setTimeout(() => {
+                    checkbox.closest('td').removeClass('bg-success-subtle');
+                }, 500);
+            },
+            error: function(err) {
+                console.error("Error detail:", err);
+
+                // Kembalikan ke state sebelumnya
+                checkbox.prop('checked', !checkbox.prop('checked'));
+
+                // Tampilkan pesan error yang lebih spesifik
+                let errorMsg = "Gagal update status list.";
+                if (err.responseJSON && err.responseJSON.error) {
+                    errorMsg += err.responseJSON.error;
+                    if (err.responseJSON.debug_id) {
+                        errorMsg += " (ID: " + err.responseJSON.debug_id + ")";
+                    }
+                } else {
+                    errorMsg += "Periksa koneksi internet atau coba lagi.";
+                }
+
+                alert(errorMsg);
+
+                // Tambahkan animasi error
+                checkbox.closest('td').addClass('bg-danger-subtle');
+                setTimeout(() => {
+                    checkbox.closest('td').removeClass('bg-danger-subtle');
+                }, 1000);
+            },
+            complete: function() {
+                // Aktifkan kembali checkbox
+                checkbox.prop('disabled', false);
             }
         });
     });
 
-    $(document).on('change', '.toggle-validasi', function() {
-        let id = $(this).data('id');
-        let field = $(this).data('field');
-        let value = $(this).is(':checked') ? 1 : 0;
+    document.addEventListener('click', function(e) {
+        const btn = e.target.closest('.btn-delete');
+        if (!btn) return;
 
-        $.ajax({
-            url: '/wisuda1/update-validasi/' + id,
-            method: 'POST',
-            data: {
-                _token: '{{ csrf_token() }}',
-                field: field,
-                value: value
-            },
-            success: function(res) {
-                console.log('Berhasil update');
-            },
-            error: function(err) {
-                console.error(err);
+        e.preventDefault();
+
+        const form = btn.closest('.delete-form');
+
+        Swal.fire({
+            icon: 'warning',
+            title: 'Are you sure you want to delete?',
+            text: 'This data will be permanently deleted.',
+            showCancelButton: true,
+            confirmButtonText: 'Yes, Delete',
+            cancelButtonText: 'Cancel',
+            confirmButtonColor: '#980517',
+            cancelButtonColor: '#6c757d'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                form.submit();
             }
         });
     });

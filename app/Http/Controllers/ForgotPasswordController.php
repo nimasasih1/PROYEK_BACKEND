@@ -3,88 +3,122 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
-use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
+use App\Models\User;
 
 class ForgotPasswordController extends Controller
 {
-    // Form request OTP
-    public function requestOtpForm()
-    {
-        return view('auth.passwords.request_otp');
-    }
-
-    // Generate dan kirim OTP
-    public function sendOtp(Request $request)
+    // Step 1: Kirim OTP ke email
+    public function requestOtp(Request $request)
     {
         $request->validate([
-            'username' => 'required|exists:users,username',
+            'username' => 'required',
+            'send_to'  => 'required|email',
         ]);
 
-        $username = $request->username;
+        // Cari user berdasarkan username
+        $user = User::where('username', $request->username)->first();
 
-        // ambil email pengirim aktif
-        $emailAccount = DB::table('email_accounts')->where('is_active', true)->first();
-        if (!$emailAccount) {
-            return back()->with('error', 'Tidak ada email pengirim aktif.');
+        if (!$user) {
+            return back()->with('error', 'Username tidak ditemukan.');
         }
 
-        // generate OTP
+        // Ambil email dari tabel users, atau dari tabel mahasiswa jika rolenya mahasiswa
+        $email = $user->email;
+        if (empty($email) && $user->role === 'mahasiswa') {
+            $mahasiswa = \App\Models\Mahasiswa::where('nim', $user->username)->first();
+            if ($mahasiswa) {
+                $email = $mahasiswa->email;
+            }
+        }
+
+        // Jika email masih kosong
+        if (empty($email)) {
+            return back()->with('error', 'Email belum terdaftar di sistem untuk user ini.');
+        }
+
+        // Cek apakah email cocok
+        if ($email !== $request->send_to) {
+            return back()->with('error', 'Email tidak sesuai dengan username.');
+        }
+
+        // Generate OTP 6 digit
         $otp = rand(100000, 999999);
 
-        // simpan ke tabel password_otps
-        DB::table('password_otps')->insert([
-            'username'   => $username,
-            'otp_code'   => $otp,
-            'expires_at' => Carbon::now()->addMinutes(10),
-            'created_at' => now(),
-            'updated_at' => now(),
-        ]);
+        // Simpan OTP ke database (tabel password_reset_tokens)
+        DB::table('password_reset_tokens')->updateOrInsert(
+            ['email' => $email],
+            [
+                'token'      => $otp,
+                'created_at' => Carbon::now(),
+            ]
+        );
 
-        // kirim email (siswa masukkan email yang sama, sistem hanya perantara)
-        Mail::raw("Kode OTP reset password Anda adalah: $otp", function ($message) use ($emailAccount, $username) {
-            $message->from($emailAccount->email, 'Sistem Reset Password');
-            $message->to($emailAccount->email); // semua siswa pakai email sama
-            $message->subject("OTP Reset Password untuk $username");
+        // Kirim OTP via email
+        Mail::raw("Kode OTP reset password kamu adalah: $otp\n\nKode ini berlaku selama 5 menit.", function ($message) use ($email) {
+            $message->to($email)
+                    ->subject('Kode OTP Reset Password');
         });
 
-        return back()->with('success', 'OTP sudah dikirim ke email.');
+        return redirect()->route('forgot.resetForm')->with('success', 'Kode OTP telah dikirim ke email kamu!')->with('username', $request->username);
     }
 
-    // Form input OTP + password baru
-    public function verifyOtpForm()
-    {
-        return view('auth.passwords.verify_otp');
-    }
-
-    // Verifikasi OTP dan ubah password
-    public function verifyOtp(Request $request)
+    // Step 2: Reset password dengan OTP
+    public function resetPassword(Request $request)
     {
         $request->validate([
-            'username' => 'required|exists:users,username',
-            'otp'      => 'required',
-            'password' => 'required|min:6|confirmed',
+            'username'                  => 'required',
+            'otp_code'                  => 'required',
+            'new_password'              => 'required|min:8|confirmed',
         ]);
 
-        $otpRecord = DB::table('password_otps')
-            ->where('username', $request->username)
-            ->where('otp_code', $request->otp)
-            ->where('expires_at', '>', now())
-            ->first();
+        $user = User::where('username', $request->username)->first();
 
-        if (!$otpRecord) {
-            return back()->with('error', 'OTP tidak valid atau sudah kadaluarsa.');
+        if (!$user) {
+            return back()->with('error', 'Username tidak ditemukan.');
         }
 
-        // update password user
-        DB::table('users')->where('username', $request->username)
-            ->update(['password' => bcrypt($request->password)]);
+        // Ambil email aktual
+        $email = $user->email;
+        if (empty($email) && $user->role === 'mahasiswa') {
+            $mahasiswa = \App\Models\Mahasiswa::where('nim', $user->username)->first();
+            if ($mahasiswa) {
+                $email = $mahasiswa->email;
+            }
+        }
 
-        // hapus OTP agar tidak bisa dipakai lagi
-        DB::table('password_otps')->where('id', $otpRecord->id)->delete();
+        if (empty($email)) {
+            return back()->with('error', 'Email tidak ditemukan.');
+        }
 
-        return redirect()->route('login')->with('success', 'Password berhasil direset.');
+        // Cek OTP
+        $record = DB::table('password_reset_tokens')
+            ->where('email', $email)
+            ->where('token', $request->otp_code)
+            ->first();
+
+        if (!$record) {
+            return back()->with('error', 'Kode OTP salah.');
+        }
+
+        // Cek apakah OTP expired (5 menit)
+        $createdAt = Carbon::parse($record->created_at);
+        if (Carbon::now()->diffInMinutes($createdAt) > 5) {
+            return back()->with('error', 'Kode OTP sudah kadaluarsa. Silakan minta kode baru.');
+        }
+
+        // Update password
+        $user->password = Hash::make($request->new_password);
+        $user->save();
+
+        // Hapus OTP dari database
+        DB::table('password_reset_tokens')
+            ->where('email', $email)
+            ->delete();
+
+        return redirect()->route('login.form')->with('success', 'Password berhasil direset! Silakan login.');
     }
 }

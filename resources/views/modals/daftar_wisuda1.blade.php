@@ -27,14 +27,10 @@
                         <textarea class="form-control" id="edit_catatan" name="catatan"></textarea>
                     </div>
 
-                    <div class="mb-3">
-                        <label for="edit_ttd_wisuda" class="form-label">Tanda Tangan</label>
-                        <input type="file" class="form-control" id="edit_ttd_wisuda" name="ttd">
-                        <small>Biarkan kosong jika tidak ingin mengganti</small>
-                    </div>
+                   
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
                     <button type="submit" class="btn btn-primary">Simpan Perubahan</button>
                 </div>
             </div>

@@ -33,6 +33,8 @@
             <option value="finance">FINANCE</option>
             <option value="perpustakaan">PERPUSTAKAAN</option>
             <option value="fakultas">FAKULTAS</option>
+            <option value="csdl">CSDL</option>
+
         </select><br><br>
 
         <button type="submit">Register</button>

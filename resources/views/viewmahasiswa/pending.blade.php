@@ -10,7 +10,7 @@
             <label for="filter" class="form-label">Filter Validasi</label>
             <select name="filter" id="filter" class="form-select" onchange="this.form.submit()">
                 <option value="">-- Semua --</option>
-                <option value="finance" {{ request('filter')=='finance' ? 'selected' : '' }}>Finance</option>
+                <option value="finance" {{ request('filter')=='finance' ? 'selected' : '' }}>Keuangan</option>
                 <option value="perpus" {{ request('filter')=='perpus' ? 'selected' : '' }}>Perpustakaan</option>
                 <option value="fakultas" {{ request('filter')=='fakultas' ? 'selected' : '' }}>Fakultas</option>
                 <option value="baak" {{ request('filter')=='baak' ? 'selected' : '' }}>BAAK</option>
@@ -33,11 +33,11 @@
                 <th>Catatan</th>
                 <th>Tanda Tangan</th>
                 <th>Finance</th>
-                <th>Library</th>
+                <th>Perpus</th>
                 <th>Fakultas</th>
                 <th>BAAK</th>
                 <th>Catatan Fakulty</th>
-                <th>Catatan Finance</th>
+                <th>Catatan Keuangan</th>
                 <th>Catatan BAAK</th>
                 <th>Status</th>
             </tr>

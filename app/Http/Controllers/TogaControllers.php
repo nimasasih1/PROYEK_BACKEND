@@ -31,6 +31,6 @@ class TogaControllers extends Controller
             Toga::create($request->all());
 
         return redirect()->route('beranda')
-                         ->with('success', 'Data pendaftaran berhasil disimpan');
+                         ->with('success', 'Registration data has been successfully saved');
     }
 }

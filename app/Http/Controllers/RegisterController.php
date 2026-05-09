@@ -18,7 +18,7 @@ class RegisterController extends Controller
         $request->validate([
             'username' => 'required|string|unique:users,username',
             'password' => 'required|string|min:6',
-            'role'     => 'required|in:mahasiswa,baak,finance,perpustakaan,fakultas',
+            'role'     => 'required|in:mahasiswa,baak,finance,perpustakaan,fakultas,csdl',
         ]);
 
         $username = $request->username;
@@ -29,6 +29,7 @@ class RegisterController extends Controller
         if ($role == "finance")  $username = "" . $username;
         if ($role == "perpustakaan") $username = "" . $username;
         if ($role == "fakultas")  $username = "" . $username;
+        if ($role == "csdl")  $username = "" . $username;
 
         DB::table('users')->insert([
             'username' => $username,
@@ -38,6 +39,6 @@ class RegisterController extends Controller
             'updated_at' => now(),
         ]);
 
-        return redirect('/')->with('success', 'Registrasi berhasil! Silakan login.');
+        return redirect('/')->with('success', 'Registration successful! Please login.');
     }
 }
