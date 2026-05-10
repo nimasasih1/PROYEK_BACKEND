@@ -54,6 +54,145 @@
   </style>
 </head>
 
+{{-- ============================================================ --}}
+{{-- TAMBAHKAN SCRIPT INI sebelum </body> di layout ADMIN/STAFF  --}}
+{{-- (layouts/dashboard.blade.php, layouts2, layouts3, dst)      --}}
+{{-- ============================================================ --}}
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+(function () {
+    // ── KONFIGURASI ──────────────────────────────────────────
+    const IDLE_MINUTES    = 15;   // menit tidak ada aktivitas → munculkan warning
+    const WARNING_MINUTES = 5;    // menit setelah warning → auto logout
+    const LOGOUT_URL      = '{{ route("logout") }}';
+    const CSRF_TOKEN      = '{{ csrf_token() }}';
+    // ─────────────────────────────────────────────────────────
+
+    const IDLE_MS    = IDLE_MINUTES    * 60 * 1000;
+    const WARNING_MS = WARNING_MINUTES * 60 * 1000;
+
+    let idleTimer    = null;
+    let logoutTimer  = null;
+    let warningShown = false;
+    let swalInstance = null;
+    let countdown    = WARNING_MINUTES * 60;
+    let countdownInterval = null;
+
+    // Reset semua timer saat ada aktivitas
+    function resetTimers() {
+        if (warningShown) return; // jangan reset kalau warning sudah muncul
+
+        clearTimeout(idleTimer);
+        clearTimeout(logoutTimer);
+
+        idleTimer = setTimeout(showWarning, IDLE_MS);
+    }
+
+    // Tampilkan popup warning dengan countdown
+    function showWarning() {
+        warningShown = true;
+        countdown    = WARNING_MINUTES * 60;
+
+        swalInstance = Swal.fire({
+            title: '⚠️ Session Expiring Soon!',
+            html: `
+                <div style="font-size:1rem; color:#555; margin-bottom:10px;">
+                    Tidak ada aktivitas terdeteksi.<br>
+                    <em style="font-size:0.85rem; color:#aaa;">No activity detected.</em>
+                </div>
+                <div style="font-size:2rem; font-weight:700; color:#980517;" id="swal-countdown">
+                    ${formatTime(countdown)}
+                </div>
+                <div style="font-size:0.85rem; color:#888; margin-top:6px;">
+                    Sesi akan berakhir otomatis.<br>
+                    <em>Session will end automatically.</em>
+                </div>
+            `,
+            icon: 'warning',
+            showCancelButton: false,
+            confirmButtonText: '✅ Saya masih di sini / I\'m still here',
+            confirmButtonColor: '#980517',
+            allowOutsideClick: false,
+            allowEscapeKey: false,
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // User klik "masih di sini" → reset semua
+                clearCountdown();
+                clearTimeout(logoutTimer);
+                warningShown = false;
+                resetTimers();
+            }
+        });
+
+        // Mulai countdown di dalam popup
+        countdownInterval = setInterval(() => {
+            countdown--;
+            const el = document.getElementById('swal-countdown');
+            if (el) el.textContent = formatTime(countdown);
+
+            if (countdown <= 0) {
+                clearCountdown();
+                doLogout();
+            }
+        }, 1000);
+
+        // Timer backup logout kalau countdown habis
+        logoutTimer = setTimeout(doLogout, WARNING_MS);
+    }
+
+    function clearCountdown() {
+        clearInterval(countdownInterval);
+        clearTimeout(logoutTimer);
+    }
+
+    function formatTime(seconds) {
+        const m = Math.floor(seconds / 60).toString().padStart(2, '0');
+        const s = (seconds % 60).toString().padStart(2, '0');
+        return `${m}:${s}`;
+    }
+
+    // Logout via POST (pakai CSRF)
+    function doLogout() {
+        if (swalInstance) Swal.close();
+
+        // Tampilkan pesan logout
+        Swal.fire({
+            title: 'Sesi Berakhir / Session Ended',
+            text: 'Anda telah logout otomatis karena tidak ada aktivitas. / You have been logged out due to inactivity.',
+            icon: 'info',
+            confirmButtonColor: '#980517',
+            confirmButtonText: 'OK',
+            allowOutsideClick: false,
+        }).then(() => {
+            // Submit form logout
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = LOGOUT_URL;
+
+            const csrf = document.createElement('input');
+            csrf.type  = 'hidden';
+            csrf.name  = '_token';
+            csrf.value = CSRF_TOKEN;
+
+            form.appendChild(csrf);
+            document.body.appendChild(form);
+            form.submit();
+        });
+    }
+
+    // Event listener aktivitas user
+    const ACTIVITY_EVENTS = ['mousemove', 'mousedown', 'keydown', 'touchstart', 'scroll', 'click'];
+    ACTIVITY_EVENTS.forEach(event => {
+        document.addEventListener(event, resetTimers, { passive: true });
+    });
+
+    // Mulai timer pertama kali
+    resetTimers();
+
+})();
+</script>
+
 <body>
 
   <div class="layout-wrapper layout-content-navbar">

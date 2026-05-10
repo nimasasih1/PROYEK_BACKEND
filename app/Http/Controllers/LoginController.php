@@ -57,19 +57,19 @@ class LoginController extends Controller
             // Arahkan sesuai role
             switch ($user->role) {
                 case 'mahasiswa':
-                    return redirect()->intended('/beranda');
+                    return redirect('/beranda');
                 case 'baak':
-                    return redirect()->intended('/layouts');
+                    return redirect('/layouts');
                 case 'finance':
-                    return redirect()->intended('/layouts2');
+                    return redirect('/layouts2');
                 case 'perpustakaan':
-                    return redirect()->intended('/layouts3');
+                    return redirect('/layouts3');
                 case 'fakultas':
-                    return redirect()->intended('/layouts4');
+                    return redirect('/layouts4');
                 case 'csdl':
-                    return redirect()->intended('/layouts5');
+                    return redirect('/layouts5');
                 default:
-                    return redirect()->intended('/');
+                    return redirect('/');
             }
         } catch (\Illuminate\Validation\ValidationException $e) {
             // Kalo error karena validasi, lempar balik aja biar pesan tetap muncul
